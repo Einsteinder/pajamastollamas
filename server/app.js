@@ -4,10 +4,25 @@ const bodyParser = require ( "body-parser" );
 let app = express();
 app.use ( bodyParser.json() );
 
+const amqp = require ( "amqplib/callback_api" );
+let mqConn = undefined;
+
+amqp.connect('amqp://localhost', (err, conn) => {
+    mqConn = conn;
+});
+
 /* Routes */
 app.get ( "/reviews/:id", async ( req, res ) => {
     let itemid = req.params.id;
     let ret = undefined; //await getReviews(itemid);
+    mqConn.createChannel(function(err, ch) {
+        var ex = 'getReviews';
+        var msg = itemid;
+    
+        ch.assertExchange(ex, 'fanout', {durable: false});
+        ch.publish(ex, '', new Buffer(msg));
+        console.log(" [x] Sent %s", msg);
+    });
     res.status ( 200 ).send ( ret );
 });
 
