@@ -4,12 +4,14 @@
   "private": true,
   "dependencies": {
     "amqplib": "^0.5.2",
-    "antd": "^3.4.1",
+    "antd": "^3.4.2",
     "express": "^4.16.3",
-    "react": "^16.3.1",
+    "mongodb": "^3.0.7",
+    "node-uuid": "^1.4.8",
+    "react": "^16.3.2",
     "react-bootstrap": "^0.32.1",
-    "react-dom": "^16.3.1",
-    "react-scripts": "1.1.4"
+    "react-dom": "^16.3.2",
+    "react-scripts": "^1.1.4"
   },
   "scripts": {
     "start": "react-scripts start",
