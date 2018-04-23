@@ -40,6 +40,43 @@ app.get ( "/item/:id", async ( req, res ) => {
     res.status ( 200 ).send ( ret );
 });
 
+app.get ( "/items/", async ( req, res ) => {
+    let ret = undefined;
+    res.status(200).send(ret);
+});
+
+app.post ( "/item/", async ( req, res ) => {
+    let body = req.body;
+    res.status(200).send(body);
+});
+
+app.post ( "/review/:id", async ( req, res ) => {
+    let id = req.params.id;
+    let body = req.body;
+    res.status(200).send(body);
+});
+
+app.post ( "/post/:id", async ( req, res ) => {
+    let id = req.params.id;
+    let body = req.body;
+    res.status(200).send({body,id});
+});
+
+app.get ( "/user/:id", async ( req, res ) => {
+    let id = req.params.id;
+    res.status(200).send(id);
+});
+
+app.post ( "/user/", async ( req, res ) => {
+    let body = req.body;
+    re.status(200).send(body);
+});
+
+app.post ( "/admin/:id", async ( req, res ) => {
+    let id = req.params.id;
+    res.status(200).send(id);
+});
+
 app.post ( "/login", async ( req, res ) => {
     let body = req.bod;
     let username = body.username;
@@ -48,7 +85,7 @@ app.post ( "/login", async ( req, res ) => {
     try {
         check = await validate ( username, hPass );
     } catch (e) {
-        res.status ( 400 ).send ( e );
+        res.status(400).send(e);
     }
     
 });
