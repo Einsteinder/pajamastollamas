@@ -11,19 +11,29 @@ amqp.connect('amqp://localhost', (err, conn) => {
     mqConn = conn;
 });
 
+function generateUuid() {
+    return Math.random().toString() + Math.random().toString() + Math.random().toString();
+}
+
 /* Routes */
+
+// GETS
+
 app.get ( "/reviews/:id", async ( req, res ) => {
     let itemid = req.params.id;
     let ret = undefined; //await getReviews(itemid);
     mqConn.createChannel(function(err, ch) {
-        var ex = 'getReviews';
-        var msg = itemid;
-    
-        ch.assertExchange(ex, 'fanout', {durable: false});
-        ch.publish(ex, '', new Buffer(msg));
-        console.log(" [x] Sent %s", msg);
+        ch.assertQueue('', {exclusive: true}, function(err, q) {
+            var corr = generateUuid();
+            ch.consume(q.queue, function(msg) {
+                if (msg.properties.correlationId === corr) {
+                    res.status(200).send(msg.content);
+                }
+            }, {noAck: true});
+
+            ch.sendToQueue('get_reviews', new Buffer(itemid.toString()), { correlationId: corr, replyTo: q.queue });
+        });
     });
-    res.status ( 200 ).send ( ret );
 });
 
 app.get ( "/posts/:id", async ( req, res ) => {
@@ -45,6 +55,13 @@ app.get ( "/items/", async ( req, res ) => {
     res.status(200).send(ret);
 });
 
+app.get ( "/user/:id", async ( req, res ) => {
+    let id = req.params.id;
+    res.status(200).send(id);
+});
+
+// POSTS
+
 app.post ( "/item/", async ( req, res ) => {
     let body = req.body;
     res.status(200).send(body);
@@ -60,11 +77,6 @@ app.post ( "/post/:id", async ( req, res ) => {
     let id = req.params.id;
     let body = req.body;
     res.status(200).send({body,id});
-});
-
-app.get ( "/user/:id", async ( req, res ) => {
-    let id = req.params.id;
-    res.status(200).send(id);
 });
 
 app.post ( "/user/", async ( req, res ) => {
