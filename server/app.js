@@ -21,7 +21,6 @@ function generateUuid() {
 
 app.get ( "/reviews/:id", async ( req, res ) => {
     let itemid = req.params.id;
-    let ret = undefined; //await getReviews(itemid);
     mqConn.createChannel(function(err, ch) {
         ch.assertQueue('', {exclusive: true}, function(err, q) {
             var corr = generateUuid();
@@ -38,67 +37,167 @@ app.get ( "/reviews/:id", async ( req, res ) => {
 
 app.get ( "/posts/:id", async ( req, res ) => {
     let itemid = req.params.id;
-    let ret = undefined; //await getPosts(itemid);
+    mqConn.createChannel(function(err, ch) {
+        ch.assertQueue('', {exclusive: true}, function(err, q) {
+            var corr = generateUuid();
+            ch.consume(q.queue, function(msg) {
+                if (msg.properties.correlationId === corr) {
+                    res.status(200).send(msg.content);
+                }
+            }, {noAck: true});
 
-    res.status ( 200 ).send ( ret );
+            ch.sendToQueue('get_posts', new Buffer(itemid.toString()), { correlationId: corr, replyTo: q.queue });
+        });
+    });
 });
 
 app.get ( "/item/:id", async ( req, res ) => {
     let itemid = req.params.id;
-    let ret = undefined; //await getItem(itemid);
+    mqConn.createChannel(function(err, ch) {
+        ch.assertQueue('', {exclusive: true}, function(err, q) {
+            var corr = generateUuid();
+            ch.consume(q.queue, function(msg) {
+                if (msg.properties.correlationId === corr) {
+                    res.status(200).send(msg.content);
+                }
+            }, {noAck: true});
 
-    res.status ( 200 ).send ( ret );
+            ch.sendToQueue('get_item', new Buffer(itemid.toString()), { correlationId: corr, replyTo: q.queue });
+        });
+    });
 });
 
 app.get ( "/items/", async ( req, res ) => {
-    let ret = undefined;
-    res.status(200).send(ret);
+    mqConn.createChannel(function(err, ch) {
+        ch.assertQueue('', {exclusive: true}, function(err, q) {
+            var corr = generateUuid();
+            ch.consume(q.queue, function(msg) {
+                if (msg.properties.correlationId === corr) {
+                    res.status(200).send(msg.content);
+                }
+            }, {noAck: true});
+
+            ch.sendToQueue('get_all_items', new Buffer(""), { correlationId: corr, replyTo: q.queue });
+        });
+    });
 });
 
 app.get ( "/user/:id", async ( req, res ) => {
     let id = req.params.id;
-    res.status(200).send(id);
+    mqConn.createChannel(function(err, ch) {
+        ch.assertQueue('', {exclusive: true}, function(err, q) {
+            var corr = generateUuid();
+            ch.consume(q.queue, function(msg) {
+                if (msg.properties.correlationId === corr) {
+                    res.status(200).send(msg.content);
+                }
+            }, {noAck: true});
+
+            ch.sendToQueue('get_user', new Buffer(id.toString()), { correlationId: corr, replyTo: q.queue });
+        });
+    });
 });
 
 // POSTS
 
 app.post ( "/item/", async ( req, res ) => {
     let body = req.body;
-    res.status(200).send(body);
+    mqConn.createChannel(function(err, ch) {
+        ch.assertQueue('', {exclusive: true}, function(err, q) {
+            var corr = generateUuid();
+            ch.consume(q.queue, function(msg) {
+                if (msg.properties.correlationId === corr) {
+                    res.status(200).send(msg.content);
+                }
+            }, {noAck: true});
+
+            ch.sendToQueue('post_item', new Buffer(JSON.stringify(body)), { correlationId: corr, replyTo: q.queue });
+        });
+    });
 });
 
 app.post ( "/review/:id", async ( req, res ) => {
     let id = req.params.id;
     let body = req.body;
-    res.status(200).send(body);
+    mqConn.createChannel(function(err, ch) {
+        ch.assertQueue('', {exclusive: true}, function(err, q) {
+            var corr = generateUuid();
+            ch.consume(q.queue, function(msg) {
+                if (msg.properties.correlationId === corr) {
+                    res.status(200).send(msg.content);
+                }
+            }, {noAck: true});
+
+            ch.sendToQueue('post_review', new Buffer(JSON.stringify({id, body})), { correlationId: corr, replyTo: q.queue });
+        });
+    });
 });
 
 app.post ( "/post/:id", async ( req, res ) => {
     let id = req.params.id;
     let body = req.body;
-    res.status(200).send({body,id});
+    mqConn.createChannel(function(err, ch) {
+        ch.assertQueue('', {exclusive: true}, function(err, q) {
+            var corr = generateUuid();
+            ch.consume(q.queue, function(msg) {
+                if (msg.properties.correlationId === corr) {
+                    res.status(200).send(msg.content);
+                }
+            }, {noAck: true});
+
+            ch.sendToQueue('post_post', new Buffer(JSON.stringify({id,body})), { correlationId: corr, replyTo: q.queue });
+        });
+    });
 });
 
 app.post ( "/user/", async ( req, res ) => {
     let body = req.body;
-    re.status(200).send(body);
+    mqConn.createChannel(function(err, ch) {
+        ch.assertQueue('', {exclusive: true}, function(err, q) {
+            var corr = generateUuid();
+            ch.consume(q.queue, function(msg) {
+                if (msg.properties.correlationId === corr) {
+                    res.status(200).send(msg.content);
+                }
+            }, {noAck: true});
+
+            ch.sendToQueue('post_user', new Buffer(JSON.stringify(body)), { correlationId: corr, replyTo: q.queue });
+        });
+    });
 });
 
 app.post ( "/admin/:id", async ( req, res ) => {
     let id = req.params.id;
-    res.status(200).send(id);
+    mqConn.createChannel(function(err, ch) {
+        ch.assertQueue('', {exclusive: true}, function(err, q) {
+            var corr = generateUuid();
+            ch.consume(q.queue, function(msg) {
+                if (msg.properties.correlationId === corr) {
+                    res.status(200).send(msg.content);
+                }
+            }, {noAck: true});
+
+            ch.sendToQueue('post_admin', new Buffer(JSON.stringify(id)), { correlationId: corr, replyTo: q.queue });
+        });
+    });
 });
 
 app.post ( "/login", async ( req, res ) => {
     let body = req.bod;
     let username = body.username;
     let hPass = body.password;
-    let check = undefined;
-    try {
-        check = await validate ( username, hPass );
-    } catch (e) {
-        res.status(400).send(e);
-    }
+    mqConn.createChannel(function(err, ch) {
+        ch.assertQueue('', {exclusive: true}, function(err, q) {
+            var corr = generateUuid();
+            ch.consume(q.queue, function(msg) {
+                if (msg.properties.correlationId === corr) {
+                    res.status(200).send(msg.content);
+                }
+            }, {noAck: true});
+
+            ch.sendToQueue('post_login', new Buffer(JSON.stringify({username, hPass})), { correlationId: corr, replyTo: q.queue });
+        });
+    });
     
 });
 
