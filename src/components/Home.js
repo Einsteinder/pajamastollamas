@@ -8,7 +8,7 @@ import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 
 const { Header, Content, Footer } = Layout;
 
-class Forum extends Component {
+class Home extends Component {
     render() {
         return (
             <div className="App">
@@ -27,7 +27,7 @@ class Forum extends Component {
                                 <NavItem eventKey={1}>
                                     <Link className="nav-link" to="/products">Products</Link>
                                 </NavItem>
-                                <NavItem eventKey={2}>
+                                <NavItem eventKey={2} href="#">
                                 <Link className="nav-link" to="/forum">Forum</Link>
     </NavItem>
                                 <NavDropdown eventKey={3} title="Dropdown" id="basic-nav-dropdown">
@@ -50,7 +50,7 @@ class Forum extends Component {
                     </Navbar>
                     <Content style={{ padding: '0 50px' }}>
 
-                        <div style={{ background: '#fff', padding: 24, minHeight: 280 }}>Forum</div>
+                        <div style={{ background: '#fff', padding: 24, minHeight: 280 }}>Welcome to llamas' paradise!</div>
                     </Content>
 
                     <Footer style={{ textAlign: 'center' }}>
@@ -62,4 +62,4 @@ class Forum extends Component {
     }
 }
 
-export default Forum;
+export default Home;

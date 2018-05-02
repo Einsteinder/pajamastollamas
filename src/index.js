@@ -6,7 +6,10 @@ import ReactDOM from 'react-dom';
 
 
 
-ReactDOM.render(<App/>
+
+ReactDOM.render(
+    <App />  
+
 
 , document.getElementById('container'));
           
