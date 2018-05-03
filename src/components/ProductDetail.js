@@ -1,15 +1,18 @@
 import React, { Component } from 'react';
-import Button from 'antd/lib/button';
 import './App.css';
 import 'antd/dist/antd.css';
 import { Layout, Menu, Breadcrumb } from 'antd';
 import { Navbar,Nav,NavItem,NavDropdown,MenuItem } from 'react-bootstrap';
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+import { Button, Comment, Form, Header } from 'semantic-ui-react'
 
-const { Header, Content, Footer } = Layout;
+const {  Content, Footer } = Layout;
 
-class Products extends Component {
+class ProductDetail extends Component {
+
     state={
+        currentUser:"u1",
+        textarea:"",
         products:[{
             imgURL:"https://d39rqydp4iuyht.cloudfront.net/store/product/165250/1000x1000/51810_MN.jpg",
             name:"Loving Paws",
@@ -116,7 +119,34 @@ class Products extends Component {
         ]
         }]
     }
+
+    handleChangeText = event => {
+        this.setState({ textarea: event.target.value });
+      }
+
+    handleClick=(event)=>{
+        var currentdate = new Date(); 
+        var datetime = currentdate.getDate() + "/"
+                    + (currentdate.getMonth()+1)  + "/" 
+                    + currentdate.getFullYear() + " @ "  
+                    + currentdate.getHours() + ":"  
+                    + currentdate.getMinutes() + ":" 
+                    + currentdate.getSeconds();
+        let newProducts = []
+        this.state.products.map(product=>(product.id===this.props.match.params.id)?
+        newProducts.push({...product,reviews:[...product.reviews,{id:this.props.match.params.id,
+                                                userId:this.state.currentUser,
+                                                content:this.state.textarea,
+                                                timestamp:datetime,
+                                                rate:5
+        }]}):newProducts.push(product))
+        this.setState({products:newProducts})
+        this.setState({textarea:""})
+        this.refs.textInput.value=" "
+
+    }
   render() {
+
     return (
       <div className="App">
       <Layout className="layout">
@@ -160,18 +190,41 @@ class Products extends Component {
 <Content style={{ padding: '0 50px' }}>
 
     <div style={{ display:"flex", flexWrap:"wrap",justifyContent:"space-around", background: '#fff', padding: 24, minHeight: 280 }}>
-        
-        
-       {this.state.products.map(product => 
-       
-        <div class="card" style={{width: "30rem"}}>
-  <img class="card-img-top" src={product.imgURL} style={{width: "100%"}} alt="Card image cap"/>
-  <div class="card-body">
-    <h5 class="card-title">{product.name}</h5>
-    <p class="card-text">${product.price}</p>
-    <Link className="btn btn-primary" to={`/products/${product.id}`}>Product Detail</Link>
-  </div>
-    </div>)}
+    {this.state.products.filter(product=>product.id===this.props.match.params.id).map(product=>
+    
+    <div>
+    <img src={product.imgURL}/>
+    <Comment.Group>
+
+
+    <Header as='h3' dividing>Comments</Header>
+
+        {product.reviews.map(review=>
+        <Comment>
+      <Comment.Content>
+        <Comment.Author>{review.userId}</Comment.Author>
+        <Comment.Metadata>
+          <div>{review.timestamp}</div>
+        </Comment.Metadata>
+        <Comment.Text>
+            {review.content}
+        </Comment.Text>
+      </Comment.Content>
+    </Comment>)}
+    
+
+
+
+    <Form reply>
+      <Form.TextArea onChange={this.handleChangeText} />
+      <Button onClick={this.handleClick }content='Add Comment' labelPosition='left' icon='edit' primary />
+    </Form>
+  </Comment.Group>
+    
+</div>
+
+    )}
+
         
         
         </div>
@@ -186,4 +239,4 @@ class Products extends Component {
   }
 }
 
-export default Products;
+export default ProductDetail;
