@@ -25,11 +25,12 @@ let exportedMethods = {
     return products().then(productCollection => {
       return products.getUserById(productId).then( product => {
         let newProduct = {
+          _id: uuid.v4(),
           name: name,
           description: description,
           tags: tags,
           imageSrc: imageSrc,
-          _id: uuid.v4()
+          reviews:[]
         };
       });
     });
