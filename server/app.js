@@ -19,8 +19,9 @@ function generateUuid() {
 
 // GETS
 
-app.get ( "/reviews/:id", async ( req, res ) => {
-    let itemid = req.params.id;
+// Gets a forum post
+app.get ( "forum/:id", ( req, res ) => {
+    let id = req.params.id;
     mqConn.createChannel(function(err, ch) {
         ch.assertQueue('', {exclusive: true}, function(err, q) {
             var corr = generateUuid();
@@ -30,12 +31,44 @@ app.get ( "/reviews/:id", async ( req, res ) => {
                 }
             }, {noAck: true});
 
-            ch.sendToQueue('get_reviews', new Buffer(itemid.toString()), { correlationId: corr, replyTo: q.queue });
+            ch.sendToQueue('get_forum_post', new Buffer(id.toString()), { correlationId: corr, replyTo: q.queue });
         });
     });
 });
 
-app.get ( "/posts/:id", async ( req, res ) => {
+app.get ( "forum/comments/:id", ( req, res ) => {
+    let id = req.params.id;
+    mqConn.createChannel(function(err, ch) {
+        ch.assertQueue('', {exclusive: true}, function(err, q) {
+            var corr = generateUuid();
+            ch.consume(q.queue, function(msg) {
+                if (msg.properties.correlationId === corr) {
+                    res.status(200).send(msg.content);
+                }
+            }, {noAck: true});
+
+            ch.sendToQueue('get_forum_comments', new Buffer(id.toString()), { correlationId: corr, replyTo: q.queue });
+        });
+    });
+});
+
+app.get ( "forum/rating/:id", ( req, res ) => {
+    let id = req.params.id;
+    mqConn.createChannel(function(err, ch) {
+        ch.assertQueue('', {exclusive: true}, function(err, q) {
+            var corr = generateUuid();
+            ch.consume(q.queue, function(msg) {
+                if (msg.properties.correlationId === corr) {
+                    res.status(200).send(msg.content);
+                }
+            }, {noAck: true});
+
+            ch.sendToQueue('get_forum_rating', new Buffer(id.toString()), { correlationId: corr, replyTo: q.queue });
+        });
+    });
+});
+
+app.get ( "item/comments/:id", async ( req, res ) => {
     let itemid = req.params.id;
     mqConn.createChannel(function(err, ch) {
         ch.assertQueue('', {exclusive: true}, function(err, q) {
@@ -46,7 +79,7 @@ app.get ( "/posts/:id", async ( req, res ) => {
                 }
             }, {noAck: true});
 
-            ch.sendToQueue('get_posts', new Buffer(itemid.toString()), { correlationId: corr, replyTo: q.queue });
+            ch.sendToQueue('get_item_comments', new Buffer(itemid.toString()), { correlationId: corr, replyTo: q.queue });
         });
     });
 });
@@ -100,6 +133,57 @@ app.get ( "/user/:id", async ( req, res ) => {
 
 // POSTS
 
+app.post ( "/forum/", ( req, res ) => {
+    let body = req.body;
+    mqConn.createChannel(function(err, ch) {
+        ch.assertQueue('', {exclusive: true}, function(err, q) {
+            var corr = generateUuid();
+            ch.consume(q.queue, function(msg) {
+                if (msg.properties.correlationId === corr) {
+                    res.status(200).send(msg.content);
+                }
+            }, {noAck: true});
+
+            ch.sendToQueue('post_forum_post', new Buffer(JSON.stringify(body)), { correlationId: corr, replyTo: q.queue });
+        });
+    });
+});
+
+app.post ( "/forum/comments/:id", ( req, res ) => {
+    let id = req.params.id;
+    let body = req.body;
+    mqConn.createChannel(function(err, ch) {
+        ch.assertQueue('', {exclusive: true}, function(err, q) {
+            var corr = generateUuid();
+            ch.consume(q.queue, function(msg) {
+                if (msg.properties.correlationId === corr) {
+                    res.status(200).send(msg.content);
+                }
+            }, {noAck: true});
+
+            ch.sendToQueue('post_forum_comment', new Buffer(JSON.stringify({body, id})), { correlationId: corr, replyTo: q.queue });
+        });
+    });
+});
+
+app.post ( "/forum/rating/:id", ( req, res ) => {
+    let id = req.params.id;
+    let body = req.body;
+    mqConn.createChannel(function(err, ch) {
+        ch.assertQueue('', {exclusive: true}, function(err, q) {
+            var corr = generateUuid();
+            ch.consume(q.queue, function(msg) {
+                if (msg.properties.correlationId === corr) {
+                    res.status(200).send(msg.content);
+                }
+            }, {noAck: true});
+
+            ch.sendToQueue('post_forum_rating', new Buffer(JSON.stringify({body, id})), { correlationId: corr, replyTo: q.queue });
+        });
+    });
+});
+
+//Requires user to be logged in 
 app.post ( "/item/", async ( req, res ) => {
     let body = req.body;
     mqConn.createChannel(function(err, ch) {
@@ -116,7 +200,8 @@ app.post ( "/item/", async ( req, res ) => {
     });
 });
 
-app.post ( "/review/:id", async ( req, res ) => {
+//Requires user to be logged in
+app.post ( "/item/comments/:id", async ( req, res ) => {
     let id = req.params.id;
     let body = req.body;
     mqConn.createChannel(function(err, ch) {
@@ -128,24 +213,7 @@ app.post ( "/review/:id", async ( req, res ) => {
                 }
             }, {noAck: true});
 
-            ch.sendToQueue('post_review', new Buffer(JSON.stringify({id, body})), { correlationId: corr, replyTo: q.queue });
-        });
-    });
-});
-
-app.post ( "/post/:id", async ( req, res ) => {
-    let id = req.params.id;
-    let body = req.body;
-    mqConn.createChannel(function(err, ch) {
-        ch.assertQueue('', {exclusive: true}, function(err, q) {
-            var corr = generateUuid();
-            ch.consume(q.queue, function(msg) {
-                if (msg.properties.correlationId === corr) {
-                    res.status(200).send(msg.content);
-                }
-            }, {noAck: true});
-
-            ch.sendToQueue('post_post', new Buffer(JSON.stringify({id,body})), { correlationId: corr, replyTo: q.queue });
+            ch.sendToQueue('post_item_comment', new Buffer(JSON.stringify({id,body})), { correlationId: corr, replyTo: q.queue });
         });
     });
 });
