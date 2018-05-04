@@ -1,4 +1,5 @@
 var amqp = require("amqplib/callback_api");
+const data = require("../data");
 
 amqp.connect('amqp://localhost', (err, conn) => {
     conn.createChannel(function(err, ch) {
@@ -7,7 +8,7 @@ amqp.connect('amqp://localhost', (err, conn) => {
         ch.assertQueue(q, {durable: false});
         ch.prefetch(1);
         console.log(' [x] Get Reviews - Waiting');
-        ch.consume(q, function reply(msg) {
+        ch.consume(q, async function reply(msg) {
             var n = parseInt(msg.content.toString());
             var r = {n,k:true};
             ch.sendToQueue(msg.properties.replyTo, new Buffer(JSON.stringify(r)), {correlationId: msg.properties.correlationId});
@@ -20,7 +21,7 @@ amqp.connect('amqp://localhost', (err, conn) => {
         ch.assertQueue(q, {durable: false});
         ch.prefetch(1);
         console.log(' [x] Get Posts - Waiting');
-        ch.consume(q, function reply(msg) {
+        ch.consume(q, async function reply(msg) {
             var id = parseInt(msg.content.toString());
             var r = id;    
             ch.sendToQueue(msg.properties.replyTo, new Buffer(r.toString()), {correlationId: msg.properties.correlationId});
@@ -33,7 +34,7 @@ amqp.connect('amqp://localhost', (err, conn) => {
         ch.assertQueue(q, {durable: false});
         ch.prefetch(1);
         console.log(' [x] Get Item - Waiting');
-        ch.consume(q, function reply(msg) {
+        ch.consume(q, async function reply(msg) {
             var n = parseInt(msg.content.toString());
             var r = n;    
             ch.sendToQueue(msg.properties.replyTo, new Buffer(r.toString()), {correlationId: msg.properties.correlationId});
@@ -46,8 +47,9 @@ amqp.connect('amqp://localhost', (err, conn) => {
         ch.assertQueue(q, {durable: false});
         ch.prefetch(1);
         console.log(' [x] Get All Items - Waiting');
-        ch.consume(q, function reply(msg) {
-            var r = [{a:"hello"},{b:"no"}];    
+        ch.consume(q, async function reply(msg) {
+            var r = [{a:"hello"},{b:"no"}];  
+            console.log ( await data.products.getAllProducts() )  
             ch.sendToQueue(msg.properties.replyTo, new Buffer(JSON.stringify(r)), {correlationId: msg.properties.correlationId});
             ch.ack(msg);
         });
@@ -58,7 +60,7 @@ amqp.connect('amqp://localhost', (err, conn) => {
         ch.assertQueue(q, {durable: false});
         ch.prefetch(1);
         console.log(' [x] Get user - waiting');
-        ch.consume(q, function reply(msg) {
+        ch.consume(q, async function reply(msg) {
             var n = parseInt(msg.content.toString());
             var r = n;    
             ch.sendToQueue(msg.properties.replyTo, new Buffer(JSON.stringify(r)), {correlationId: msg.properties.correlationId});
@@ -71,7 +73,7 @@ amqp.connect('amqp://localhost', (err, conn) => {
         ch.assertQueue(q, {durable: false});
         ch.prefetch(1);
         console.log(' [x] Post Item - waiting');
-        ch.consume(q, function reply(msg) {
+        ch.consume(q, async function reply(msg) {
             var n = JSON.parse(msg.content);
             var r = n;    
             ch.sendToQueue(msg.properties.replyTo, new Buffer(JSON.stringify(r)), {correlationId: msg.properties.correlationId});
@@ -84,7 +86,7 @@ amqp.connect('amqp://localhost', (err, conn) => {
         ch.assertQueue(q, {durable: false});
         ch.prefetch(1);
         console.log(' [x] Post review - waiting');
-        ch.consume(q, function reply(msg) {
+        ch.consume(q, async function reply(msg) {
             var n = parseInt(msg.content.toString());
             var r = n;    
             ch.sendToQueue(msg.properties.replyTo, new Buffer(JSON.stringify(r)), {correlationId: msg.properties.correlationId});
@@ -97,7 +99,7 @@ amqp.connect('amqp://localhost', (err, conn) => {
         ch.assertQueue(q, {durable: false});
         ch.prefetch(1);
         console.log(' [x] Post post - waiting');
-        ch.consume(q, function reply(msg) {
+        ch.consume(q, async function reply(msg) {
             var n = parseInt(msg.content.toString());
             var r = n;    
             ch.sendToQueue(msg.properties.replyTo, new Buffer(JSON.stringify(r)), {correlationId: msg.properties.correlationId});
@@ -110,7 +112,7 @@ amqp.connect('amqp://localhost', (err, conn) => {
         ch.assertQueue(q, {durable: false});
         ch.prefetch(1);
         console.log(' [x] Post user - waiting');
-        ch.consume(q, function reply(msg) {
+        ch.consume(q, async function reply(msg) {
             var n = parseInt(msg.content.toString());
             var r = n;    
             ch.sendToQueue(msg.properties.replyTo, new Buffer(JSON.stringify(r)), {correlationId: msg.properties.correlationId});
@@ -123,7 +125,7 @@ amqp.connect('amqp://localhost', (err, conn) => {
         ch.assertQueue(q, {durable: false});
         ch.prefetch(1);
         console.log(' [x] Post Admin - waiting');
-        ch.consume(q, function reply(msg) {
+        ch.consume(q, async function reply(msg) {
             var n = parseInt(msg.content.toString());
             var r = n;    
             ch.sendToQueue(msg.properties.replyTo, new Buffer(JSON.stringify(r)), {correlationId: msg.properties.correlationId});
@@ -136,7 +138,7 @@ amqp.connect('amqp://localhost', (err, conn) => {
         ch.assertQueue(q, {durable: false});
         ch.prefetch(1);
         console.log(' [x] Post login - waiting');
-        ch.consume(q, function reply(msg) {
+        ch.consume(q, async function reply(msg) {
             var n = parseInt(msg.content.toString());
             var r = n;    
             ch.sendToQueue(msg.properties.replyTo, new Buffer(JSON.stringify(r)), {correlationId: msg.properties.correlationId});
