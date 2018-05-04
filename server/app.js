@@ -3,6 +3,7 @@ const bodyParser = require ( "body-parser" );
 
 let app = express();
 app.use ( bodyParser.json() );
+app.use(express.static('static'))
 
 const amqp = require ( "amqplib/callback_api" );
 let mqConn = undefined;
