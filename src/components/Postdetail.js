@@ -1,37 +1,17 @@
+
+import { Grid, Image,Container, Header,Comment,Form,Ref } from 'semantic-ui-react'
 import React, { Component } from 'react';
 import Button from 'antd/lib/button';
 import './App.css';
 import 'antd/dist/antd.css';
-import { Layout, Menu, Breadcrumb,List, Avatar, Icon  } from 'antd';
-
-
+import { Layout, Menu, Breadcrumb } from 'antd';
 import { Navbar, Nav, NavItem, NavDropdown, MenuItem } from 'react-bootstrap';
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+const { Content, Footer } = Layout;
 
-const { Header, Content, Footer } = Layout;
-
-/*
-const listData = [];
-for (let i = 0; i < 23; i++) {
-  listData.push({
-    href: 'http://ant.design',
-    title: `ant design part ${i}`,
-    avatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
-    description: 'Ant Design, a design language for background applications, is refined by Ant UED Team.',
-    content: 'We supply a series of design principles, practical patterns and high quality design resources (Sketch and Axure), to help people create their product prototypes beautifully and efficiently.',
-  });
-}
-*/
-const IconText = ({ type, text }) => (
-  <span>
-    <Icon type={type} style={{ marginRight: 8 }} />
-    {text}
-  </span>
-);
-
-class Forum extends Component {
+class Postdetail extends Component {
     componentDidMount(){
-       this.props.fetchPosts()
+        this.props.fetchPostComments()
     }
     render() {
         return (
@@ -51,10 +31,10 @@ class Forum extends Component {
                                 <NavItem eventKey={1}>
                                     <Link className="nav-link" to="/products">Products</Link>
                                 </NavItem>
-                                <NavItem eventKey={2}>
+                                <NavItem eventKey={2} href="#">
                                 <Link className="nav-link" to="/forum">Forum</Link>
     </NavItem>
-     
+                          
                             </Nav>
                             <Nav pullRight>
                                 <NavItem eventKey={1} href="#">
@@ -69,43 +49,51 @@ class Forum extends Component {
                     <Content style={{ padding: '0 50px' }}>
 
                         <div style={{ background: '#fff', padding: 24, minHeight: 280 }}>
-                            
-                            
-                            
-                            
-                            
-                        <List
-    itemLayout="vertical"
-    size="large"
-    pagination={{
-      onChange: (page) => {
-        console.log(page);
-      },
-      pageSize: 3,
-    }}
-    dataSource={this.props.posts}
-    renderItem={item => (
-      <List.Item
-        key={item.title}
-        actions={[<IconText type="star-o" text="156" />, <IconText type="like-o" text="156" />, <IconText type="message" text="2" />]}
-      >
-        <List.Item.Meta
-       
 
-          title={ <Link to={`/forum/${item.id}`}>{item.title}</Link>}
-          description={item.description}
-        />
-        {item.content.substring(0,130)}
-        ...
-      </List.Item>
-    )}
-  />
-                            
-                            
-                            
-                            
-                            
-                            </div>
+
+
+    <Container text>
+    <Header as='h2'>{this.props.posts.filter(post=>(post.id===this.props.postId)).map(post=>post.title)}</Header>
+    <Header as='h4'>Author: {this.props.posts.filter(post=>(post.id===this.props.postId)).map(post=>post.author)}</Header>
+    <p>{this.props.posts.filter(post=>(post.id===this.props.postId)).map(post=>post.content)}</p>
+    <Comment.Group>
+
+
+<Header as='h3' dividing>Comments</Header>
+
+    {this.props.comments.filter(comment=>comment.parentId===this.props.postId).map(review=>
+    <Comment>
+  <Comment.Content>
+    <Comment.Author>{review.author}</Comment.Author>
+    <Comment.Metadata>
+      <div>{review.timestamp}</div>
+    </Comment.Metadata>
+    <Comment.Text>
+        {review.content}
+    </Comment.Text>
+  </Comment.Content>
+</Comment>)}
+
+
+
+
+<Form reply>
+<Ref innerRef={this.handleRef}>
+
+  <Form.TextArea onChange={this.handleChangeText} />
+  </Ref>
+
+  <Button onClick={this.handleClick }content='Add Comment' labelPosition='left' icon='edit' primary />
+</Form>
+</Comment.Group>
+  
+  </Container>
+
+
+
+
+
+                        </div>
                     </Content>
 
                     <Footer style={{ textAlign: 'center' }}>
@@ -117,4 +105,6 @@ class Forum extends Component {
     }
 }
 
-export default Forum;
+
+
+export default Postdetail

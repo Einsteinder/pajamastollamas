@@ -1,6 +1,9 @@
 
 const comments = (state = [], action) => {
     switch (action.type) {
+      case 'RECEIVE_POST_COMMENTS':
+        return action.comments
+
       case 'ADD_COMMENT':
 
   

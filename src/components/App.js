@@ -10,6 +10,8 @@ import { BrowserRouter as Router,Route} from "react-router-dom";
 import Forum from './Forum';
 import ProductDetail from './ProductDetail';
 import PostsContainer from '../containers/PostsContainer';
+import Postdetail from './Postdetail';
+import PostDetailContainer from '../containers/PostDetailContainer';
 
 const { Header, Content, Footer } = Layout;
 
@@ -23,6 +25,8 @@ class App extends Component {
         <Route exact path="/products" component={Products} />
         <Route exact path="/forum" component={PostsContainer} />
         <Route exact path="/products/:id" component={ProductDetail} />
+        <Route exact path="/forum/:id" component={PostDetailContainer} />
+
 
 
     </div>

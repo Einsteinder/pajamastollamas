@@ -4,7 +4,7 @@ import 'antd/dist/antd.css';
 import { Layout, Menu, Breadcrumb } from 'antd';
 import { Navbar,Nav,NavItem,NavDropdown,MenuItem } from 'react-bootstrap';
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
-import { Button, Comment, Form, Header ,Ref} from 'semantic-ui-react'
+import { Button, Comment, Form, Header ,Ref,Container} from 'semantic-ui-react'
 
 const {  Content, Footer } = Layout;
 
@@ -199,7 +199,10 @@ class ProductDetail extends Component {
     {this.state.products.filter(product=>product.id===this.props.match.params.id).map(product=>
     
     <div>
-    <img src={product.imgURL}/>
+
+    <img src={product.imgURL} style={{height:"800",width:"800"}}/>
+    <Container text>
+
     <Comment.Group>
 
 
@@ -230,12 +233,14 @@ class ProductDetail extends Component {
       <Button onClick={this.handleClick }content='Add Comment' labelPosition='left' icon='edit' primary />
     </Form>
   </Comment.Group>
+  </Container>
+
     
 </div>
 
     )}
 
-        
+
         
         </div>
   </Content>
