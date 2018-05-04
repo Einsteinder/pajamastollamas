@@ -21,7 +21,7 @@ function generateUuid() {
 // GETS
 
 // Gets a forum post
-app.get ( "forum/:id", ( req, res ) => {
+app.get ( "/forum/:id", ( req, res ) => {
     let id = req.params.id;
     mqConn.createChannel(function(err, ch) {
         ch.assertQueue('', {exclusive: true}, function(err, q) {
@@ -37,7 +37,22 @@ app.get ( "forum/:id", ( req, res ) => {
     });
 });
 
-app.get ( "forum/comments/:id", ( req, res ) => {
+app.get ( "/forum/", ( req, res ) => {
+    mqConn.createChannel(function(err, ch) {
+        ch.assertQueue('', {exclusive: true}, function(err, q) {
+            var corr = generateUuid();
+            ch.consume(q.queue, function(msg) {
+                if (msg.properties.correlationId === corr) {
+                    res.status(200).send(msg.content);
+                }
+            }, {noAck: true});
+
+            ch.sendToQueue('get_all_forum_posts', new Buffer(""), { correlationId: corr, replyTo: q.queue });
+        });
+    });
+});
+
+app.get ( "/forum/comments/:id", ( req, res ) => {
     let id = req.params.id;
     mqConn.createChannel(function(err, ch) {
         ch.assertQueue('', {exclusive: true}, function(err, q) {
@@ -53,7 +68,7 @@ app.get ( "forum/comments/:id", ( req, res ) => {
     });
 });
 
-app.get ( "forum/rating/:id", ( req, res ) => {
+app.get ( "/forum/rating/:id", ( req, res ) => {
     let id = req.params.id;
     mqConn.createChannel(function(err, ch) {
         ch.assertQueue('', {exclusive: true}, function(err, q) {
@@ -69,7 +84,7 @@ app.get ( "forum/rating/:id", ( req, res ) => {
     });
 });
 
-app.get ( "item/comments/:id", async ( req, res ) => {
+app.get ( "/item/comments/:id", async ( req, res ) => {
     let itemid = req.params.id;
     mqConn.createChannel(function(err, ch) {
         ch.assertQueue('', {exclusive: true}, function(err, q) {
@@ -128,6 +143,22 @@ app.get ( "/user/:id", async ( req, res ) => {
             }, {noAck: true});
 
             ch.sendToQueue('get_user', new Buffer(id.toString()), { correlationId: corr, replyTo: q.queue });
+        });
+    });
+});
+
+app.get ( "/items/search/:query", ( req, res ) => {
+    let query = req.params.query;
+    mqConn.createChannel(function (err, ch) {
+        ch.assertQueue('', {exclusive: true}, function(err, q) {
+            var corr = generateUuid();
+            ch.consume(q.queue, function(msg) {
+                if (msg.properties.correlationId === corr) {
+                    res.status(200).send(msg.content);
+                }
+            }, {noAck: true});
+
+            ch.sendToQueue('search_items', new Buffer(query.toString()), { correlationId: corr, replyTo: q.queue });
         });
     });
 });
