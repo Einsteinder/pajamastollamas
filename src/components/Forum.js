@@ -2,13 +2,37 @@ import React, { Component } from 'react';
 import Button from 'antd/lib/button';
 import './App.css';
 import 'antd/dist/antd.css';
-import { Layout, Menu, Breadcrumb } from 'antd';
+import { Layout, Menu, Breadcrumb,List, Avatar, Icon  } from 'antd';
+
+
 import { Navbar, Nav, NavItem, NavDropdown, MenuItem } from 'react-bootstrap';
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 
 const { Header, Content, Footer } = Layout;
 
+/*
+const listData = [];
+for (let i = 0; i < 23; i++) {
+  listData.push({
+    href: 'http://ant.design',
+    title: `ant design part ${i}`,
+    avatar: 'https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png',
+    description: 'Ant Design, a design language for background applications, is refined by Ant UED Team.',
+    content: 'We supply a series of design principles, practical patterns and high quality design resources (Sketch and Axure), to help people create their product prototypes beautifully and efficiently.',
+  });
+}
+*/
+const IconText = ({ type, text }) => (
+  <span>
+    <Icon type={type} style={{ marginRight: 8 }} />
+    {text}
+  </span>
+);
+
 class Forum extends Component {
+    componentDidMount(){
+       this.props.fetchPosts()
+    }
     render() {
         return (
             <div className="App">
@@ -30,13 +54,7 @@ class Forum extends Component {
                                 <NavItem eventKey={2}>
                                 <Link className="nav-link" to="/forum">Forum</Link>
     </NavItem>
-                                <NavDropdown eventKey={3} title="Dropdown" id="basic-nav-dropdown">
-                                    <MenuItem eventKey={3.1}>Action</MenuItem>
-                                    <MenuItem eventKey={3.2}>Another action</MenuItem>
-                                    <MenuItem eventKey={3.3}>Something else here</MenuItem>
-                                    <MenuItem divider />
-                                    <MenuItem eventKey={3.3}>Separated link</MenuItem>
-                                </NavDropdown>
+     
                             </Nav>
                             <Nav pullRight>
                                 <NavItem eventKey={1} href="#">
@@ -50,7 +68,41 @@ class Forum extends Component {
                     </Navbar>
                     <Content style={{ padding: '0 50px' }}>
 
-                        <div style={{ background: '#fff', padding: 24, minHeight: 280 }}>Forum</div>
+                        <div style={{ background: '#fff', padding: 24, minHeight: 280 }}>
+                            
+                            
+                            
+                            
+                            
+                        <List
+    itemLayout="vertical"
+    size="large"
+    pagination={{
+      onChange: (page) => {
+        console.log(page);
+      },
+      pageSize: 3,
+    }}
+    dataSource={this.props.posts}
+    renderItem={item => (
+      <List.Item
+        key={item.title}
+        actions={[<IconText type="star-o" text="156" />, <IconText type="like-o" text="156" />, <IconText type="message" text="2" />]}
+      >
+        <List.Item.Meta
+          title={<a href={item.href}>{item.title}</a>}
+          description={item.description}
+        />
+        {item.content}
+      </List.Item>
+    )}
+  />
+                            
+                            
+                            
+                            
+                            
+                            </div>
                     </Content>
 
                     <Footer style={{ textAlign: 'center' }}>
