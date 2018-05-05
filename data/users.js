@@ -25,6 +25,8 @@ let exportedMethods = {
         firstName: firstName,
         lastName: lastName,
         _id: uuid.v4(),
+        username: username,
+        password: password, 
         posts: [],
         products:[],
         reviews:[]
