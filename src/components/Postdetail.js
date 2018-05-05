@@ -19,6 +19,27 @@ class Postdetail extends Component {
         this.setState({textarea:e.target.value})
     }
     handleClick=()=>{
+        var currentdate = new Date(); 
+        var datetime = currentdate.getDate() + "/"
+                    + (currentdate.getMonth()+1)  + "/" 
+                    + currentdate.getFullYear() + " @ "  
+                    + currentdate.getHours() + ":"  
+                    + currentdate.getMinutes() + ":" 
+                    + currentdate.getSeconds();
+        
+        const uuidv1 = require('uuid/v1');
+        const newComment = {
+            id:uuidv1(),
+            parentId:this.props.postId,
+            userId:"cuurentLoginUser",
+            author:"Your Father",
+            productId:this.props.productId,
+            content:this.state.textarea,
+            voteScore: -5,
+            deleted: false,
+            timestamp:datetime,
+        }
+        this.props.postPostComment(newComment)
         this.setState({textarea:""})
     }
     render() {

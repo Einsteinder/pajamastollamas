@@ -37,9 +37,8 @@ componentDidMount(){
             productId:this.props.productId,
             content:this.state.textarea,
             timestamp:datetime,
-            rat:5
+            rate:5
         }
-        console.log(newComment)
         this.props.postProductComment(newComment)
         this.setState({textarea:""})
         

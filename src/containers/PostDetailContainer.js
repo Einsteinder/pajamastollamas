@@ -1,7 +1,7 @@
 import { connect } from 'react-redux'
 import Forum from '../components/Forum';
 import Postdetail from '../components/Postdetail';
-import {fetchPostComments} from '../actions'
+import {fetchPostComments, postPostComment, } from '../actions'
 
 
 const mapStateToProps = (state,ownProps) => (
@@ -13,6 +13,8 @@ const mapStateToProps = (state,ownProps) => (
 
   const mapDispatchToProps = (dispatch) => ({
     fetchPostComments: () =>dispatch(fetchPostComments()),
+    postPostComment: (comment) =>dispatch(postPostComment(comment)),
+
   })
 
 

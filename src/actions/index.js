@@ -37,8 +37,15 @@ export function addProductComment(comment) {
   };
 }
 
-export function postProductComment(comment) {
-  console.log(comment)
+export function addPostComment(comment) {
+  return {
+      type: 'ADD_POST_COMMENT',
+      comment
+  };
+}
+
+
+export function postPostComment(comment) {
 
   
   return (dispatch)=>{
@@ -47,8 +54,27 @@ export function postProductComment(comment) {
       setTimeout(resolve, 1000, "post comment successfully");
     });
     promise1.then((response)=>{
-      console.log(response)
-      console.log(comment)
+
+      dispatch(addPostComment(comment));
+
+    })
+
+
+};
+}
+
+
+export function postProductComment(comment) {
+
+
+  
+  return (dispatch)=>{
+
+    var promise1 = new Promise(function(resolve, reject) {
+      setTimeout(resolve, 1000, "post comment successfully");
+    });
+    promise1.then((response)=>{
+
       dispatch(addProductComment(comment));
 
     })

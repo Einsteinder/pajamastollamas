@@ -4,21 +4,12 @@ const comments = (state = [], action) => {
       case 'RECEIVE_POST_COMMENTS':
         return action.comments
 
-      case 'ADD_COMMENT':
+      case 'ADD_POST_COMMENT':
 
   
         return [
           ...state,
-          {
-            id: action.id,
-            parentId:action.parentId,
-            body: action.body,
-            author:action.author,
-            timestamp:action.timestamp,
-            voteScore:0,
-            deleted: false,
-            parentDeleted:false
-          }
+          action.comment
         ]
 
       case 'UPDATE_COMMENT':
