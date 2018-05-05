@@ -37,12 +37,38 @@ export function addProductComment(comment) {
   };
 }
 
+
+export function addPost(post) {
+  return {
+      type: 'ADD_POST',
+      post
+  };
+}
 export function addPostComment(comment) {
   return {
       type: 'ADD_POST_COMMENT',
       comment
   };
 }
+
+export function postPost(post) {
+
+  
+  return (dispatch)=>{
+
+    var promise1 = new Promise(function(resolve, reject) {
+      setTimeout(resolve, 1000, "post post successfully");
+    });
+    promise1.then((response)=>{
+
+      dispatch(addPost(post));
+
+    })
+
+
+};
+}
+
 
 
 export function postPostComment(comment) {
@@ -248,16 +274,7 @@ export const fetchPosts =() =>{
  }
 
 
-export const addPost = (title,author,body,timestamp) => ({
-  type: 'ADD_POST',
-  id: nextPostId++,
-  voteScore:0,
-  title,
-  author,
-  body,
-  timestamp
 
-})
 export const updatePost = (id,category,title,author,body,timestamp) => ({
   type:'UPDATE_POST',
   id,

@@ -1,16 +1,17 @@
 import React, { Component } from 'react';
-import Button from 'antd/lib/button';
 import './App.css';
 import 'antd/dist/antd.css';
-import { Layout, Menu, Breadcrumb,List, Avatar, Icon  } from 'antd';
+import {Form,Input,Popover, Button,Layout, Menu, Breadcrumb,List, Avatar, Icon  } from 'antd';
 
 
 import { Navbar, Nav, NavItem, NavDropdown, MenuItem } from 'react-bootstrap';
 import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 
 const { Header, Content, Footer } = Layout;
+const { TextArea } = Input;
+const FormItem = Form.Item;
 
-/*
+
 const listData = [];
 for (let i = 0; i < 23; i++) {
   listData.push({
@@ -21,7 +22,7 @@ for (let i = 0; i < 23; i++) {
     content: 'We supply a series of design principles, practical patterns and high quality design resources (Sketch and Axure), to help people create their product prototypes beautifully and efficiently.',
   });
 }
-*/
+
 const IconText = ({ type, text }) => (
   <span>
     <Icon type={type} style={{ marginRight: 8 }} />
@@ -30,10 +31,61 @@ const IconText = ({ type, text }) => (
 );
 
 class Forum extends Component {
+    state = {
+        postTitle:"",
+        postContent:"",
+        visible: false,
+      }
+      hide = () => {
+        this.setState({
+          visible: false,
+        });
+      }
+      handleSubmit = (e)=>{
+        e.preventDefault();
+        var currentdate = new Date(); 
+        var datetime = currentdate.getDate() + "/"
+                    + (currentdate.getMonth()+1)  + "/" 
+                    + currentdate.getFullYear() + " @ "  
+                    + currentdate.getHours() + ":"  
+                    + currentdate.getMinutes() + ":" 
+                    + currentdate.getSeconds();
+        
+        const uuidv1 = require('uuid/v1');
+        const newPost = {
+            id:uuidv1(),
+            userId:"cuurentLoginUser",
+            author:"Your Father",
+            timestamp:datetime,
+            title:this.state.postTitle,
+            content:this.state.postContent,
+            voteScore: 0,
+            deleted: false,
+            commentCount:0
+ 
+        }
+        this.props.postPost(newPost)
+        this.setState({postTitle:"",postContent:"",visible:false})
+
+
+      }
+      handleVisibleChange = (visible) => {
+        this.setState({ visible });
+      }
+      handleTitleChange = (e)=>{
+          this.setState({postTitle:e.target.value})
+      }
+      handleContentChange = (e)=>{
+        this.setState({postContent:e.target.value})
+    }
     componentDidMount(){
        this.props.fetchPosts()
     }
     render() {
+        const formItemLayout = {
+            labelCol: { span: 2 },
+            wrapperCol: { span: 18 },
+          } 
         return (
             <div className="App">
                 <Layout className="layout">
@@ -71,9 +123,44 @@ class Forum extends Component {
                         <div style={{ background: '#fff', padding: 24, minHeight: 280 }}>
                             
                             
+                        <Popover
+        content={    
+            <div style={{width:"1000"}}> 
+            <Form layout={'horizontal'} onSubmit={this.handleSubmit}>
+          <FormItem
+    
+            
+          >
+          </FormItem>
+          <FormItem
+            label="Title"
+         
+
+          >
+            <Input value = {this.state.postTitle} onChange={this.handleTitleChange} placeholder="give a name for your article..." />
+          </FormItem>
+          <FormItem
+            label="Content"
+          >
+            <TextArea value = {this.state.postContent} onChange={this.handleContentChange}placeholder="write what you think..." autosize={{ minRows: 2, maxRows: 12 }} />
+
+          </FormItem>
+          <FormItem >
+            <Button type="primary" htmlType="submit">Publish</Button>
+          </FormItem>
+        </Form>
+        </div>
+}       placement="bottom"
+        title="Add New Post"
+        trigger="click"
+        visible={this.state.visible}
+        onVisibleChange={this.handleVisibleChange}
+        size={"large"}
+      >
+      <Button type="primary"  shape="circle" icon="plus" size={"large"} />
+      </Popover>      
                             
-                            
-                            
+         
                         <List
     itemLayout="vertical"
     size="large"
