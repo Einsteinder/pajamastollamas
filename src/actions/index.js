@@ -30,6 +30,34 @@ export function itemsIsLoading(bool) {
   };
 }
 
+export function addProductComment(comment) {
+  return {
+      type: 'ADD_PRODUCT_COMMENT',
+      comment
+  };
+}
+
+export function postProductComment(comment) {
+  console.log(comment)
+
+  
+  return (dispatch)=>{
+
+    var promise1 = new Promise(function(resolve, reject) {
+      setTimeout(resolve, 1000, "post comment successfully");
+    });
+    promise1.then((response)=>{
+      console.log(response)
+      console.log(comment)
+      dispatch(addProductComment(comment));
+
+    })
+
+
+};
+}
+
+
 export const receiveProducts = products=>({
   type:'RECEIVE_PRODUCTS',
   products
@@ -107,10 +135,9 @@ export const fetchProducts =() =>{
 
     dispatch(itemsIsLoading(true));
     var promise1 = new Promise(function(resolve, reject) {
-      setTimeout(resolve, 4000, products);
+      setTimeout(resolve, 1000, products);
     });
     promise1.then((response)=>{
-      console.log(response)
       dispatch(itemsIsLoading(false));
       return response;
 

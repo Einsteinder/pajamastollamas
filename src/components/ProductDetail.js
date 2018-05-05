@@ -10,126 +10,12 @@ const {  Content, Footer } = Layout;
 
 class ProductDetail extends Component {
 
-    constructor(props) {
-        super(props);
-        this.textInput = React.createRef();
-        this.handleClick = this.handleClick.bind(this);
-
-
-        this.state ={
-            node:"",
-            currentUser:"u1",
-            textarea:"",
-            products:[{
-                imgURL:"https://d39rqydp4iuyht.cloudfront.net/store/product/165250/1000x1000/51810_MN.jpg",
-                name:"Loving Paws",
-                price:10,
-                id:"p1",
-                reviews:[{
-                    id:"r1",
-                    userId:"u1",
-                    content:"Love these pjs. Warm, comfortable and wonderful for lounging or sleeping. Highly recommend.",
-                    timestamp:"February 8, 2018",
-                    rate:4
-                },
-                {
-                    id:"r2",
-                    userId:"u2",
-                    content:"Bought these as a gift for my mother-in-law. She loved them. Says they're soft & comfy & keep her warm. She is always cold at night but not anymore. I have purchased several items and am pleased with them all.",
-                    timestamp:"January 13, 2018",
-                    rate:5
-                }
-            ]
-            },
-            {
-                imgURL:"https://d39rqydp4iuyht.cloudfront.net/store/product/191733/1000x1000/58818_Crop1.jpg",
-                name:"All Over Paws Plush Lounge Pants",
-                price:11,
-                id:"p2",
-                reviews:[{
-                    id:"r3",
-                    userId:"u2",
-                    content:"Love these pjs. Warm, comfortable and wonderful for lounging or sleeping. Highly recommend.",
-                    timestamp:"February 8, 2018",
-                    rate:4
-                },
-                {
-                    id:"r4",
-                    userId:"u2",
-                    content:"Bought these as a gift for my mother-in-law. She loved them. Says they're soft & comfy & keep her warm. She is always cold at night but not anymore. I have purchased several items and am pleased with them all.",
-                    timestamp:"January 13, 2018",
-                    rate:5
-                }
-            ]
-            },
-            {
-                imgURL:"https://d39rqydp4iuyht.cloudfront.net/store/product/190414/1000x1000/83200_MN.jpg",
-                name:"Super Cozy™ Sherbet Pets Slipper Booties",
-                price:12,
-                id:"p3",
-                reviews:[{
-                    id:"r5",
-                    userId:"u1",
-                    content:"Love these pjs. Warm, comfortable and wonderful for lounging or sleeping. Highly recommend.",
-                    timestamp:"February 8, 2018",
-                    rate:4
-                },
-                {
-                    id:"r6",
-                    userId:"u3",
-                    content:"Bought these as a gift for my mother-in-law. She loved them. Says they're soft & comfy & keep her warm. She is always cold at night but not anymore. I have purchased several items and am pleased with them all.",
-                    timestamp:"January 13, 2018",
-                    rate:5
-                }
-            ]
-            },
-            {
-                imgURL:"https://d39rqydp4iuyht.cloudfront.net/store/product/194651/1000x1000/26498_LAB.jpg",
-                name:"Purple Paw Women's Casual Shorts",
-                price:15,
-                id:"p4",
-                reviews:[{
-                    id:"r7",
-                    userId:"u1",
-                    content:"Love these pjs. Warm, comfortable and wonderful for lounging or sleeping. Highly recommend.",
-                    timestamp:"February 8, 2018",
-                    rate:4
-                },
-                {
-                    id:"r8",
-                    userId:"u2",
-                    content:"Bought these as a gift for my mother-in-law. She loved them. Says they're soft & comfy & keep her warm. She is always cold at night but not anymore. I have purchased several items and am pleased with them all.",
-                    timestamp:"January 13, 2018",
-                    rate:5
-                }
-            ]
-            },
-            {
-                imgURL:"https://d39rqydp4iuyht.cloudfront.net/store/product/190623/1000x1000/85382_MN.jpg",
-                name:"Rainbow Paws Thermal Long Sleeve Top",
-                price:5,
-                id:"p5",
-                reviews:[{
-                    id:"r9",
-                    userId:"u1",
-                    content:"Love these pjs. Warm, comfortable and wonderful for lounging or sleeping. Highly recommend.",
-                    timestamp:"February 8, 2018",
-                    rate:4
-                },
-                {
-                    id:"r10",
-                    userId:"u3",
-                    content:"Bought these as a gift for my mother-in-law. She loved them. Says they're soft & comfy & keep her warm. She is always cold at night but not anymore. I have purchased several items and am pleased with them all.",
-                    timestamp:"January 13, 2018",
-                    rate:5
-                }
-            ]
-            }]
-        }
-    ;
-      }
-
-
+state={
+    textarea:""
+}
+componentDidMount(){
+    this.props.fetchProductComments()
+}
     handleChangeText = event => {
         this.setState({ textarea: event.target.value });
       }
@@ -142,15 +28,19 @@ class ProductDetail extends Component {
                     + currentdate.getHours() + ":"  
                     + currentdate.getMinutes() + ":" 
                     + currentdate.getSeconds();
-        let newProducts = []
-        this.state.products.map(product=>(product.id===this.props.match.params.id)?
-        newProducts.push({...product,reviews:[...product.reviews,{id:this.props.match.params.id,
-                                                userId:this.state.currentUser,
-                                                content:this.state.textarea,
-                                                timestamp:datetime,
-                                                rate:5
-        }]}):newProducts.push(product))
-        this.setState({products:newProducts})
+        
+        const uuidv1 = require('uuid/v1');
+        const newComment = {
+            id:uuidv1(),
+            userId:"cuurentLoginUser",
+            author:"Your Father",
+            productId:this.props.productId,
+            content:this.state.textarea,
+            timestamp:datetime,
+            rat:5
+        }
+        console.log(newComment)
+        this.props.postProductComment(newComment)
         this.setState({textarea:""})
         
 
@@ -193,7 +83,7 @@ class ProductDetail extends Component {
 <Content style={{ padding: '0 50px' }}>
 
     <div style={{ display:"flex", flexWrap:"wrap",justifyContent:"space-around", background: '#fff', padding: 24, minHeight: 280 }}>
-    {this.state.products.filter(product=>product.id===this.props.match.params.id).map(product=>
+    {this.props.products.filter(product=>product.id===this.props.match.params.id).map(product=>
     
     <div>
 
@@ -205,7 +95,7 @@ class ProductDetail extends Component {
 
     <Header as='h3' dividing>Comments</Header>
 
-        {product.reviews.map(review=>
+        {this.props.comments.filter(comment =>comment.productId===product.id).map(review=>
         <Comment>
       <Comment.Content>
         <Comment.Author>{review.author}</Comment.Author>
