@@ -1,32 +1,31 @@
 import React, { Component } from 'react';
-import Button from 'antd/lib/button';
 import './App.css';
 import 'antd/dist/antd.css';
-import { Popover,Layout, Menu, Breadcrumb } from 'antd';
-import { Navbar, Nav, NavItem, NavDropdown, MenuItem } from 'react-bootstrap';
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+import { Popover, Layout, } from 'antd';
+import { Navbar, Nav, NavItem } from 'react-bootstrap';
+import { Link } from "react-router-dom";
 import Login from './Login';
 import Signup from './Signup';
 
-const { Header, Content, Footer } = Layout;
+const { Content, Footer } = Layout;
 
 class AppLayout extends Component {
     state = {
         login_visible: false,
         signup_visible: false,
 
-      }
-      hidesignin = () => {
+    }
+    hidesignin = () => {
         this.setState({
             signin_visible: false,
         });
-      }
-      handleVisibleChange = (login_visible) => {
+    }
+    handleVisibleChange = (login_visible) => {
         this.setState({ login_visible });
-      }
-      handleSingUpVisibleChange = (signup_visible) => {
+    }
+    handleSingUpVisibleChange = (signup_visible) => {
         this.setState({ signup_visible });
-      }
+    }
     render() {
         return (
             <div className="App">
@@ -42,38 +41,38 @@ class AppLayout extends Component {
                         </Navbar.Header>
                         <Navbar.Collapse>
                             <Nav>
-                                <NavItem eventKey={1}>
-                                    <Link className="nav-link" to="/products">Products</Link>
+                                <NavItem eventKey={1} href="/products">
+                                   Products
                                 </NavItem>
-                                <NavItem eventKey={2} href="#">
-                                <Link className="nav-link" to="/forum">Forum</Link>
-    </NavItem>
-                          
+                                <NavItem eventKey={2} href="/forum">
+                                   Forum
+                                </NavItem>
+
                             </Nav>
                             <Nav pullRight>
-                            <Popover
-        content={<Login/>}
-        title="Title"
-        trigger="click"
-        visible={this.state.login_visible}
-        onVisibleChange={this.handleVisibleChange}
-      >
-      <NavItem eventKey={1} href="#">
-                                    Login
+                                <Popover
+                                    content={<Login />}
+                                    title="Title"
+                                    trigger="click"
+                                    visible={this.state.login_visible}
+                                    onVisibleChange={this.handleVisibleChange}
+                                >
+                                    <NavItem eventKey={1} >
+                                        Login
     </NavItem>
-      </Popover>
-      <Popover
-        content={<Signup/>}
-        title="Title"
-        trigger="click"
-        visible={this.state.signup_visible}
-        onVisibleChange={this.handleSingUpVisibleChange}
-      >
-      <NavItem eventKey={2} href="#">
-                                    Sign up
+                                </Popover>
+                                <Popover
+                                    content={<Signup />}
+                                    title="Title"
+                                    trigger="click"
+                                    visible={this.state.signup_visible}
+                                    onVisibleChange={this.handleSingUpVisibleChange}
+                                >
+                                    <NavItem eventKey={2} href="#">
+                                        Sign up
     </NavItem>
-      </Popover>       
-                         
+                                </Popover>
+
                             </Nav>
                         </Navbar.Collapse>
                     </Navbar>

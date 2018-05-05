@@ -1,7 +1,6 @@
 
 import React from 'react';
-import ReactDOM from 'react-dom';
-import { Form, Icon, Input, Button, Checkbox } from 'antd';
+import { Form, Icon, Input, Button } from 'antd';
 const FormItem = Form.Item;
 
 class Login extends React.Component {

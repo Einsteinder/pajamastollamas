@@ -1,13 +1,9 @@
 import React, { Component } from 'react';
 import './App.css';
 import 'antd/dist/antd.css';
-import { Layout, Menu, Breadcrumb } from 'antd';
-import { Navbar,Nav,NavItem,NavDropdown,MenuItem } from 'react-bootstrap';
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
-import { Button, Comment, Form, Header ,Ref,Container} from 'semantic-ui-react'
+import { Button, Comment, Form, Header ,Container} from 'semantic-ui-react'
 import AppLayout from './AppLayout';
 
-const {  Content, Footer } = Layout;
 
 class ProductDetail extends Component {
 
@@ -53,7 +49,7 @@ componentDidMount(){
     
     <div>
 
-    <img src={product.imgURL} style={{height:"800",width:"800"}}/>
+    <img src={product.imgURL} style={{height:"800",width:"800"}} alt={product.name}/>
     <Container text>
 
     <Comment.Group>

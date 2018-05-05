@@ -1,14 +1,9 @@
 import React, { Component } from 'react';
 import './App.css';
 import 'antd/dist/antd.css';
-import {Form,Input,Popover, Button,Layout, Menu, Breadcrumb,List, Avatar, Icon  } from 'antd';
-
-
-import { Navbar, Nav, NavItem, NavDropdown, MenuItem } from 'react-bootstrap';
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+import {Form,Input,Popover, Button, List, Icon  } from 'antd';
+import { Link } from "react-router-dom";
 import AppLayout from './AppLayout';
-
-const { Header, Content, Footer } = Layout;
 const { TextArea } = Input;
 const FormItem = Form.Item;
 
@@ -83,10 +78,7 @@ class Forum extends Component {
        this.props.fetchPosts()
     }
     render() {
-        const formItemLayout = {
-            labelCol: { span: 2 },
-            wrapperCol: { span: 18 },
-          } 
+
         return (
             <AppLayout content={<div>                   <Popover
         content={    

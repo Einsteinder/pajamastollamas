@@ -2,10 +2,8 @@
 
 
 
-let nextPostId = 0
 let nextCommentId = 0
-const UP = 'UP'
-const DOWN = 'DOWN'
+
 
 
 export const receivePosts = posts=>({

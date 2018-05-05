@@ -1,5 +1,4 @@
 import { connect } from 'react-redux'
-import Forum from '../components/Forum';
 import Postdetail from '../components/Postdetail';
 import {fetchPostComments, postPostComment, } from '../actions'
 
