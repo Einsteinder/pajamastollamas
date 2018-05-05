@@ -16,6 +16,112 @@ export const receivePostComments = comments=>({
   type:'RECEIVE_POST_COMMENTS',
   comments
 })
+
+export function itemsHasErrored(bool) {
+  return {
+      type: 'ITEMS_HAS_ERRORED',
+      hasErrored: bool
+  };
+}
+export function itemsIsLoading(bool) {
+  return {
+      type: 'ITEMS_IS_LOADING',
+      isLoading: bool
+  };
+}
+
+export const receiveProducts = products=>({
+  type:'RECEIVE_PRODUCTS',
+  products
+})
+export const receiveProductComments = comments=>({
+  type:'RECEIVE_PRODUCT_COMMENTS',
+  comments
+})
+
+
+export const fetchProductComments =() =>{
+  let comments=[{
+    id:"r1",
+    userId:"u1",
+    author:"Super Man",
+    productId:"p1",
+    content:"Love these pjs. Warm, comfortable and wonderful for lounging or sleeping. Highly recommend.",
+    timestamp:"February 8, 2018",
+    rate:4
+},
+{
+    id:"r2",
+    userId:"u2",
+    author:"Spider Man",
+    productId:"p2",
+    content:"Bought these as a gift for my mother-in-law. She loved them. Says they're soft & comfy & keep her warm. She is always cold at night but not anymore. I have purchased several items and am pleased with them all.",
+    timestamp:"January 13, 2018",
+    rate:5
+}
+]
+
+  return (dispatch)=>{
+      setTimeout(()=>{
+    dispatch(receiveProductComments(comments))
+},1000)
+};
+}
+
+
+export const fetchProducts =() =>{
+  let products=[{
+    imgURL:"https://d39rqydp4iuyht.cloudfront.net/store/product/165250/1000x1000/51810_MN.jpg",
+    name:"Loving Paws",
+    price:10,
+    id:"p1",
+},
+{
+    imgURL:"https://d39rqydp4iuyht.cloudfront.net/store/product/191733/1000x1000/58818_Crop1.jpg",
+    name:"All Over Paws Plush Lounge Pants",
+    price:11,
+    id:"p2",
+},
+{
+    imgURL:"https://d39rqydp4iuyht.cloudfront.net/store/product/190414/1000x1000/83200_MN.jpg",
+    name:"Super Cozy™ Sherbet Pets Slipper Booties",
+    price:12,
+    id:"p3",
+},
+{
+    imgURL:"https://d39rqydp4iuyht.cloudfront.net/store/product/194651/1000x1000/26498_LAB.jpg",
+    name:"Purple Paw Women's Casual Shorts",
+    price:15,
+    id:"p4",
+
+},
+{
+    imgURL:"https://d39rqydp4iuyht.cloudfront.net/store/product/190623/1000x1000/85382_MN.jpg",
+    name:"Rainbow Paws Thermal Long Sleeve Top",
+    price:5,
+    id:"p5",
+
+}]
+
+  return (dispatch)=>{
+
+    dispatch(itemsIsLoading(true));
+    var promise1 = new Promise(function(resolve, reject) {
+      setTimeout(resolve, 4000, products);
+    });
+    promise1.then((response)=>{
+      console.log(response)
+      dispatch(itemsIsLoading(false));
+      return response;
+
+    })
+    .then((res)=>{
+      dispatch(receiveProducts(res))
+    })
+
+};
+}
+
 /*
 export const fetchPosts =() => dispatch =>{
   return api.fetchPosts().then(posts => dispatch(receivePosts(posts)))

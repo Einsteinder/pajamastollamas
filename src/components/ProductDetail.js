@@ -128,7 +128,6 @@ class ProductDetail extends Component {
         }
     ;
       }
-      handleRef = node => this.setState({ node })
 
 
     handleChangeText = event => {
@@ -154,9 +153,7 @@ class ProductDetail extends Component {
         this.setState({products:newProducts})
         this.setState({textarea:""})
         
-        this.state.node.children[0].value=""
-        console.log(this.state.node.children[0].value
-)
+
     }
   render() {
 
@@ -211,7 +208,7 @@ class ProductDetail extends Component {
         {product.reviews.map(review=>
         <Comment>
       <Comment.Content>
-        <Comment.Author>{review.userId}</Comment.Author>
+        <Comment.Author>{review.author}</Comment.Author>
         <Comment.Metadata>
           <div>{review.timestamp}</div>
         </Comment.Metadata>
@@ -225,10 +222,8 @@ class ProductDetail extends Component {
 
 
     <Form reply>
-    <Ref innerRef={this.handleRef}>
 
-      <Form.TextArea onChange={this.handleChangeText} />
-      </Ref>
+      <Form.TextArea onChange={this.handleChangeText} value={this.state.textarea} />
 
       <Button onClick={this.handleClick }content='Add Comment' labelPosition='left' icon='edit' primary />
     </Form>

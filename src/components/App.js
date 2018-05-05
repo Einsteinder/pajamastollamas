@@ -12,6 +12,7 @@ import ProductDetail from './ProductDetail';
 import PostsContainer from '../containers/PostsContainer';
 import Postdetail from './Postdetail';
 import PostDetailContainer from '../containers/PostDetailContainer';
+import ProductsContainer from '../containers/ProductsContainer';
 
 const { Header, Content, Footer } = Layout;
 
@@ -22,7 +23,7 @@ class App extends Component {
         <Router>
           <div>
         <Route exact path="/" component={Home} />
-        <Route exact path="/products" component={Products} />
+        <Route exact path="/products" component={ProductsContainer} />
         <Route exact path="/forum" component={PostsContainer} />
         <Route exact path="/products/:id" component={ProductDetail} />
         <Route exact path="/forum/:id" component={PostDetailContainer} />

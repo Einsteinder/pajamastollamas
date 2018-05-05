@@ -1,7 +1,6 @@
 
-import { Grid, Image,Container, Header,Comment,Form,Ref } from 'semantic-ui-react'
+import {Button, Grid, Image,Container, Header,Comment,Form,Ref } from 'semantic-ui-react'
 import React, { Component } from 'react';
-import Button from 'antd/lib/button';
 import './App.css';
 import 'antd/dist/antd.css';
 import { Layout, Menu, Breadcrumb } from 'antd';
@@ -10,10 +9,20 @@ import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 const { Content, Footer } = Layout;
 
 class Postdetail extends Component {
+    state={
+        textarea:""
+    }
     componentDidMount(){
         this.props.fetchPostComments()
     }
+    handleChangeText=(e)=>{
+        this.setState({textarea:e.target.value})
+    }
+    handleClick=()=>{
+        this.setState({textarea:""})
+    }
     render() {
+
         return (
             <div className="App">
                 <Layout className="layout">
@@ -78,10 +87,8 @@ class Postdetail extends Component {
 
 
 <Form reply>
-<Ref innerRef={this.handleRef}>
 
-  <Form.TextArea onChange={this.handleChangeText} />
-  </Ref>
+  <Form.TextArea onChange={this.handleChangeText}  value = {this.state.textarea}/>
 
   <Button onClick={this.handleClick }content='Add Comment' labelPosition='left' icon='edit' primary />
 </Form>
