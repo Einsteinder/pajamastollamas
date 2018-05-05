@@ -49,6 +49,33 @@ body {
 .ant-carousel .slick-slide h3 {
   color: #fff;
 }
+
+
+
+
+
+.navbar {
+  min-height: 70px;
+}
+
+.navbar-brand {
+  padding: 0 15px;
+  height: 70px;
+  line-height: 70px;
+}
+
+.navbar-toggle {
+  margin-top: 18px;
+  padding: 7px 8px !important;
+}
+
+@media (min-width: 768px) {
+  .navbar-nav > li > a {
+    padding-top: 21.5px;
+    padding-bottom: 21.5px;
+    line-height: 27px;
+  }
+}
 @keyframes App-logo-spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }

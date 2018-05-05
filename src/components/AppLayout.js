@@ -6,6 +6,7 @@ import { Navbar, Nav, NavItem } from 'react-bootstrap';
 import { Link } from "react-router-dom";
 import Login from './Login';
 import Signup from './Signup';
+import  ElasticSearch  from './ElasticSearch';
 
 const { Content, Footer } = Layout;
 
@@ -40,12 +41,15 @@ class AppLayout extends Component {
                             <Navbar.Toggle />
                         </Navbar.Header>
                         <Navbar.Collapse>
-                            <Nav>
+                            <Nav >
                                 <NavItem eventKey={1} href="/products">
                                    Products
                                 </NavItem>
                                 <NavItem eventKey={2} href="/forum">
                                    Forum
+                                </NavItem>
+                                <NavItem >
+                                   <ElasticSearch/>
                                 </NavItem>
 
                             </Nav>
