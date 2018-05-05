@@ -26,14 +26,12 @@ let exportedMethods = {
     return posts().then(postCollection => {
       return products.getUserById(posterId).then(userThatPosted => {
         let newPost = {
+          _id: uuid.v4(),
           title: title,
           body: body,
-          poster: {
-            id: posterId,
-            name: `${userThatPosted.firstName} ${userThatPosted.lastName}`
-          },
-          tags: tags,
-          _id: uuid.v4()
+          posterId: posterId,
+          name: `${userThatPosted.firstName} ${userThatPosted.lastName}`,
+          tags: tags
         };
 
         return postCollection

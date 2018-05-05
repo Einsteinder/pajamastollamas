@@ -30,6 +30,7 @@ let exportedMethods = {
           description: description,
           tags: tags,
           imageSrc: imageSrc,
+          price:price,
           reviews:[]
         };
       });
