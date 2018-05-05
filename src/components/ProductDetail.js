@@ -58,7 +58,7 @@ componentDidMount(){
     <Header as='h3' dividing>Comments</Header>
 
         {this.props.comments.filter(comment =>comment.productId===product.id).map(review=>
-        <Comment>
+        <Comment >
       <Comment.Content>
         <Comment.Author>{review.author}</Comment.Author>
         <Comment.Metadata>

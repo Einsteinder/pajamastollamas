@@ -52,7 +52,7 @@ class Postdetail extends Component {
 <Header as='h3' dividing>Comments</Header>
 
     {this.props.comments.filter(comment=>comment.parentId===this.props.postId).map(review=>
-    <Comment>
+    <Comment key={review.id}>
   <Comment.Content>
     <Comment.Author>{review.author}</Comment.Author>
     <Comment.Metadata>

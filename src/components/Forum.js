@@ -131,7 +131,7 @@ class Forum extends Component {
     renderItem={item => (
       <List.Item
         key={item.title}
-        actions={[<IconText type="star-o" text="156" />, <IconText type="like-o" text="156" />, <IconText type="message" text="2" />]}
+        actions={[<IconText type="like-o" text={item.voteScore} />, <IconText type="message" text={item.commentCount} />]}
       >
         <List.Item.Meta
        
