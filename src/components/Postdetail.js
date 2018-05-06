@@ -1,12 +1,9 @@
 
-import {Button, Grid, Image,Container, Header,Comment,Form,Ref } from 'semantic-ui-react'
+import {Button,Container, Header,Comment,Form } from 'semantic-ui-react'
 import React, { Component } from 'react';
 import './App.css';
 import 'antd/dist/antd.css';
-import { Layout, Menu, Breadcrumb } from 'antd';
-import { Navbar, Nav, NavItem, NavDropdown, MenuItem } from 'react-bootstrap';
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
-const { Content, Footer } = Layout;
+import AppLayout from './AppLayout';
 
 class Postdetail extends Component {
     state={
@@ -19,49 +16,33 @@ class Postdetail extends Component {
         this.setState({textarea:e.target.value})
     }
     handleClick=()=>{
+        var currentdate = new Date(); 
+        var datetime = currentdate.getDate() + "/"
+                    + (currentdate.getMonth()+1)  + "/" 
+                    + currentdate.getFullYear() + " @ "  
+                    + currentdate.getHours() + ":"  
+                    + currentdate.getMinutes() + ":" 
+                    + currentdate.getSeconds();
+        
+        const uuidv1 = require('uuid/v1');
+        const newComment = {
+            id:uuidv1(),
+            parentId:this.props.postId,
+            userId:"cuurentLoginUser",
+            author:"Your Father",
+            productId:this.props.productId,
+            content:this.state.textarea,
+            voteScore: -5,
+            deleted: false,
+            timestamp:datetime,
+        }
+        this.props.postPostComment(newComment)
         this.setState({textarea:""})
     }
     render() {
 
         return (
-            <div className="App">
-                <Layout className="layout">
-
-                    <Navbar inverse collapseOnSelect>
-                        <Navbar.Header>
-                            <Navbar.Brand>
-                                <Link className="nav-link" to="/">Pajamas to Llamas</Link>
-
-                            </Navbar.Brand>
-                            <Navbar.Toggle />
-                        </Navbar.Header>
-                        <Navbar.Collapse>
-                            <Nav>
-                                <NavItem eventKey={1}>
-                                    <Link className="nav-link" to="/products">Products</Link>
-                                </NavItem>
-                                <NavItem eventKey={2} href="#">
-                                <Link className="nav-link" to="/forum">Forum</Link>
-    </NavItem>
-                          
-                            </Nav>
-                            <Nav pullRight>
-                                <NavItem eventKey={1} href="#">
-                                    Login
-    </NavItem>
-                                <NavItem eventKey={2} href="#">
-                                    Sign up
-    </NavItem>
-                            </Nav>
-                        </Navbar.Collapse>
-                    </Navbar>
-                    <Content style={{ padding: '0 50px' }}>
-
-                        <div style={{ background: '#fff', padding: 24, minHeight: 280 }}>
-
-
-
-    <Container text>
+            <AppLayout content={ <Container text>
     <Header as='h2'>{this.props.posts.filter(post=>(post.id===this.props.postId)).map(post=>post.title)}</Header>
     <Header as='h4'>Author: {this.props.posts.filter(post=>(post.id===this.props.postId)).map(post=>post.author)}</Header>
     <p>{this.props.posts.filter(post=>(post.id===this.props.postId)).map(post=>post.content)}</p>
@@ -71,7 +52,7 @@ class Postdetail extends Component {
 <Header as='h3' dividing>Comments</Header>
 
     {this.props.comments.filter(comment=>comment.parentId===this.props.postId).map(review=>
-    <Comment>
+    <Comment key={review.id}>
   <Comment.Content>
     <Comment.Author>{review.author}</Comment.Author>
     <Comment.Metadata>
@@ -94,20 +75,8 @@ class Postdetail extends Component {
 </Form>
 </Comment.Group>
   
-  </Container>
+  </Container>}/>
 
-
-
-
-
-                        </div>
-                    </Content>
-
-                    <Footer style={{ textAlign: 'center' }}>
-                        Pajamas to Llamas ©2018 Created by Cowboys of Gilead
-  </Footer>
-                </Layout>
-            </div>
         );
     }
 }

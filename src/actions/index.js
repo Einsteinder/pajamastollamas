@@ -2,10 +2,8 @@
 
 
 
-let nextPostId = 0
 let nextCommentId = 0
-const UP = 'UP'
-const DOWN = 'DOWN'
+
 
 
 export const receivePosts = posts=>({
@@ -29,6 +27,86 @@ export function itemsIsLoading(bool) {
       isLoading: bool
   };
 }
+
+export function addProductComment(comment) {
+  return {
+      type: 'ADD_PRODUCT_COMMENT',
+      comment
+  };
+}
+
+
+export function addPost(post) {
+  return {
+      type: 'ADD_POST',
+      post
+  };
+}
+export function addPostComment(comment) {
+  return {
+      type: 'ADD_POST_COMMENT',
+      comment
+  };
+}
+
+export function postPost(post) {
+
+  
+  return (dispatch)=>{
+
+    var promise1 = new Promise(function(resolve, reject) {
+      setTimeout(resolve, 1000, "post post successfully");
+    });
+    promise1.then((response)=>{
+
+      dispatch(addPost(post));
+
+    })
+
+
+};
+}
+
+
+
+export function postPostComment(comment) {
+
+  
+  return (dispatch)=>{
+
+    var promise1 = new Promise(function(resolve, reject) {
+      setTimeout(resolve, 1000, "post comment successfully");
+    });
+    promise1.then((response)=>{
+
+      dispatch(addPostComment(comment));
+
+    })
+
+
+};
+}
+
+
+export function postProductComment(comment) {
+
+
+  
+  return (dispatch)=>{
+
+    var promise1 = new Promise(function(resolve, reject) {
+      setTimeout(resolve, 1000, "post comment successfully");
+    });
+    promise1.then((response)=>{
+
+      dispatch(addProductComment(comment));
+
+    })
+
+
+};
+}
+
 
 export const receiveProducts = products=>({
   type:'RECEIVE_PRODUCTS',
@@ -107,10 +185,9 @@ export const fetchProducts =() =>{
 
     dispatch(itemsIsLoading(true));
     var promise1 = new Promise(function(resolve, reject) {
-      setTimeout(resolve, 4000, products);
+      setTimeout(resolve, 1000, products);
     });
     promise1.then((response)=>{
-      console.log(response)
       dispatch(itemsIsLoading(false));
       return response;
 
@@ -195,16 +272,7 @@ export const fetchPosts =() =>{
  }
 
 
-export const addPost = (title,author,body,timestamp) => ({
-  type: 'ADD_POST',
-  id: nextPostId++,
-  voteScore:0,
-  title,
-  author,
-  body,
-  timestamp
 
-})
 export const updatePost = (id,category,title,author,body,timestamp) => ({
   type:'UPDATE_POST',
   id,

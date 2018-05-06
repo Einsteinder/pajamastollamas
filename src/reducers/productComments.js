@@ -1,24 +1,16 @@
 
-const comments = (state = [], action) => {
+const productComments = (state = [], action) => {
     switch (action.type) {
-      case 'RECEIVE_POST_COMMENTS':
+      case 'RECEIVE_PRODUCT_COMMENTS':
         return action.comments
 
-      case 'ADD_COMMENT':
+      case 'ADD_PRODUCT_COMMENT':
 
   
         return [
           ...state,
-          {
-            id: action.id,
-            parentId:action.parentId,
-            body: action.body,
-            author:action.author,
-            timestamp:action.timestamp,
-            voteScore:0,
-            deleted: false,
-            parentDeleted:false
-          }
+          
+            action.comment
         ]
 
 
@@ -28,5 +20,5 @@ const comments = (state = [], action) => {
     }
   }
   
-  export default comments
+  export default productComments
   

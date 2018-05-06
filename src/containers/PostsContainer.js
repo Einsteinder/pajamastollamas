@@ -1,5 +1,5 @@
 import { connect } from 'react-redux'
-import {fetchPosts } from '../actions'
+import {fetchPosts, postPost } from '../actions'
 import Forum from '../components/Forum';
 
 
@@ -10,6 +10,7 @@ const mapStateToProps = state => (
 
 const mapDispatchToProps = (dispatch) => ({
     fetchPosts: () =>dispatch(fetchPosts()),
+    postPost:(post)=>dispatch(postPost(post))
   })
 
   export default connect(

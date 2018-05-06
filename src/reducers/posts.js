@@ -6,15 +6,7 @@ const posts = (state = [], action) => {
   
         return [
           ...state,
-          {
-            id: action.id,
-            body: action.body,
-            title:action.title,
-            author:action.author,
-            timestamp:action.timestamp,
-            voteScore:action.voteScore,
-            deleted: false
-          }
+          action.post
         ]
       case 'RECEIVE_POSTS':
    

@@ -1,16 +1,13 @@
 import React, { Component } from 'react';
-import Button from 'antd/lib/button';
 import './App.css';
 import 'antd/dist/antd.css';
-import { Layout, Menu, Breadcrumb,List, Avatar, Icon  } from 'antd';
+import {Form,Input,Popover, Button, List, Icon  } from 'antd';
+import { Link } from "react-router-dom";
+import AppLayout from './AppLayout';
+const { TextArea } = Input;
+const FormItem = Form.Item;
 
 
-import { Navbar, Nav, NavItem, NavDropdown, MenuItem } from 'react-bootstrap';
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
-
-const { Header, Content, Footer } = Layout;
-
-/*
 const listData = [];
 for (let i = 0; i < 23; i++) {
   listData.push({
@@ -21,7 +18,7 @@ for (let i = 0; i < 23; i++) {
     content: 'We supply a series of design principles, practical patterns and high quality design resources (Sketch and Axure), to help people create their product prototypes beautifully and efficiently.',
   });
 }
-*/
+
 const IconText = ({ type, text }) => (
   <span>
     <Icon type={type} style={{ marginRight: 8 }} />
@@ -30,50 +27,97 @@ const IconText = ({ type, text }) => (
 );
 
 class Forum extends Component {
+    state = {
+        postTitle:"",
+        postContent:"",
+        visible: false,
+      }
+      hide = () => {
+        this.setState({
+          visible: false,
+        });
+      }
+      handleSubmit = (e)=>{
+        e.preventDefault();
+        var currentdate = new Date(); 
+        var datetime = currentdate.getDate() + "/"
+                    + (currentdate.getMonth()+1)  + "/" 
+                    + currentdate.getFullYear() + " @ "  
+                    + currentdate.getHours() + ":"  
+                    + currentdate.getMinutes() + ":" 
+                    + currentdate.getSeconds();
+        
+        const uuidv1 = require('uuid/v1');
+        const newPost = {
+            id:uuidv1(),
+            userId:"cuurentLoginUser",
+            author:"Your Father",
+            timestamp:datetime,
+            title:this.state.postTitle,
+            content:this.state.postContent,
+            voteScore: 0,
+            deleted: false,
+            commentCount:0
+ 
+        }
+        this.props.postPost(newPost)
+        this.setState({postTitle:"",postContent:"",visible:false})
+
+
+      }
+      handleVisibleChange = (visible) => {
+        this.setState({ visible });
+      }
+      handleTitleChange = (e)=>{
+          this.setState({postTitle:e.target.value})
+      }
+      handleContentChange = (e)=>{
+        this.setState({postContent:e.target.value})
+    }
     componentDidMount(){
        this.props.fetchPosts()
     }
     render() {
+
         return (
-            <div className="App">
-                <Layout className="layout">
+            <AppLayout content={<div>                   <Popover
+        content={    
+            <div style={{width:"1000"}}> 
+            <Form layout={'horizontal'} onSubmit={this.handleSubmit}>
+          <FormItem
+    
+            
+          >
+          </FormItem>
+          <FormItem
+            label="Title"
+         
 
-                    <Navbar inverse collapseOnSelect>
-                        <Navbar.Header>
-                            <Navbar.Brand>
-                                <Link className="nav-link" to="/">Pajamas to Llamas</Link>
+          >
+            <Input value = {this.state.postTitle} onChange={this.handleTitleChange} placeholder="give a name for your article..." />
+          </FormItem>
+          <FormItem
+            label="Content"
+          >
+            <TextArea value = {this.state.postContent} onChange={this.handleContentChange}placeholder="write what you think..." autosize={{ minRows: 2, maxRows: 12 }} />
 
-                            </Navbar.Brand>
-                            <Navbar.Toggle />
-                        </Navbar.Header>
-                        <Navbar.Collapse>
-                            <Nav>
-                                <NavItem eventKey={1}>
-                                    <Link className="nav-link" to="/products">Products</Link>
-                                </NavItem>
-                                <NavItem eventKey={2}>
-                                <Link className="nav-link" to="/forum">Forum</Link>
-    </NavItem>
-     
-                            </Nav>
-                            <Nav pullRight>
-                                <NavItem eventKey={1} href="#">
-                                    Login
-    </NavItem>
-                                <NavItem eventKey={2} href="#">
-                                    Sign up
-    </NavItem>
-                            </Nav>
-                        </Navbar.Collapse>
-                    </Navbar>
-                    <Content style={{ padding: '0 50px' }}>
-
-                        <div style={{ background: '#fff', padding: 24, minHeight: 280 }}>
+          </FormItem>
+          <FormItem >
+            <Button type="primary" htmlType="submit">Publish</Button>
+          </FormItem>
+        </Form>
+        </div>
+}       placement="bottom"
+        title="Add New Post"
+        trigger="click"
+        visible={this.state.visible}
+        onVisibleChange={this.handleVisibleChange}
+        size={"large"}
+      >
+      <Button type="primary"  shape="circle" icon="plus" size={"large"} />
+      </Popover>      
                             
-                            
-                            
-                            
-                            
+         
                         <List
     itemLayout="vertical"
     size="large"
@@ -87,7 +131,7 @@ class Forum extends Component {
     renderItem={item => (
       <List.Item
         key={item.title}
-        actions={[<IconText type="star-o" text="156" />, <IconText type="like-o" text="156" />, <IconText type="message" text="2" />]}
+        actions={[<IconText type="like-o" text={item.voteScore} />, <IconText type="message" text={item.commentCount} />]}
       >
         <List.Item.Meta
        
@@ -99,20 +143,8 @@ class Forum extends Component {
         ...
       </List.Item>
     )}
-  />
-                            
-                            
-                            
-                            
-                            
-                            </div>
-                    </Content>
-
-                    <Footer style={{ textAlign: 'center' }}>
-                        Pajamas to Llamas ©2018 Created by Cowboys of Gilead
-  </Footer>
-                </Layout>
-            </div>
+  /></div>}/>
+  
         );
     }
 }
