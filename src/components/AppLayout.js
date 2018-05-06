@@ -6,7 +6,7 @@ import { Navbar, Nav, NavItem } from 'react-bootstrap';
 import { Link } from "react-router-dom";
 import Login from './Login';
 import Signup from './Signup';
-import  ElasticSearch  from './ElasticSearch';
+import SearchContainer from '../containers/SearchContainer';
 
 const { Content, Footer } = Layout;
 
@@ -49,7 +49,7 @@ class AppLayout extends Component {
                                    Forum
                                 </NavItem>
                                 <NavItem >
-                                   <ElasticSearch/>
+                                   <SearchContainer/>
                                 </NavItem>
 
                             </Nav>

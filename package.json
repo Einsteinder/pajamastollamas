@@ -6,12 +6,8 @@
     "amqplib": "^0.5.2",
     "antd": "^3.4.2",
     "express": "^4.16.3",
-<<<<<<< HEAD
-    "mongodb": "^2.2.33",
-=======
     "faker": "^4.1.0",
     "mongodb": "^3.0.7",
->>>>>>> 1f324a92a691e4db91bfa9798760aefa10bd452d
     "node-uuid": "^1.4.8",
     "react": "^16.3.2",
     "react-bootstrap": "^0.32.1",
