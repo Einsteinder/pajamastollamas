@@ -1,9 +1,10 @@
 const amqp = require("amqplib/callback_api");
 const data = require("../data");
-const users = require("../data/users");
-const items = require ("../data/products");
-const icomments = require ("../data/reviews");
-const fposts = require ( "../data/posts" );
+const users = data.users;
+const items = data.products;
+const icomments = data.review;
+const fposts = data.posts;
+const bcrypt = require("bcrypt");
 //const fcomments = require ( "../data/reviews" );
 /* const elasticsearch = require('elasticsearch');
 const esclient = new elasticsearch.Client({
@@ -230,8 +231,14 @@ amqp.connect('amqp://localhost', (err, conn) => {
         console.log(' [x] Post User - Waiting');
         ch.consume(q, async function reply(msg) {
             var n = JSON.parse(msg.content.toString());
-            
-            var r = {n,k:true};//await data.users.create
+            var enpassword = bcrypt.hashSync(n.password);
+            var userInfo = {
+                userName = n.email,
+                password = enpassword,
+                nickName = n.nickname
+            }
+            var r = await users.addUser(userInfo);//await data.users.create
+
             ch.sendToQueue(msg.properties.replyTo, new Buffer(JSON.stringify(r)), {correlationId: msg.properties.correlationId});
             ch.ack(msg);
         });
@@ -257,9 +264,12 @@ amqp.connect('amqp://localhost', (err, conn) => {
         console.log(' [x] Post Login - Waiting');
         ch.consume(q, async function reply(msg) {
             var n = msg.content.toString();
-
-            var r = {n,k:true};//await data.login(asdas)
-            
+            await  passport.authenticate('local', (err, user, info) => {
+                if (err) {
+                    return next(err);
+                }
+                return user.id;
+            });
             ch.sendToQueue(msg.properties.replyTo, new Buffer(JSON.stringify(r)), {correlationId: msg.properties.correlationId});
             ch.ack(msg);
         });

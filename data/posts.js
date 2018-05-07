@@ -9,9 +9,9 @@ let exportedMethods = {
       return postCollection.find({}).toArray();
     });
   },
-  getPostsByTag(tag) {
+  getPostsByTitle(title) {
     return posts().then(postCollection => {
-      return postCollection.find({ tags: tag }).toArray();
+      return postCollection.find({ title: title }).toArray();
     });
   },
   getPostById(id) {
@@ -27,11 +27,13 @@ let exportedMethods = {
       return products.getUserById(posterId).then(userThatPosted => {
         let newPost = {
           _id: uuid.v4(),
-          title: title,
-          body: body,
+          title:title,
           posterId: posterId,
-          name: `${userThatPosted.firstName} ${userThatPosted.lastName}`,
-          tags: tags
+          name: `${userThatPosted.nickName}`,
+          timestamp: timestamp,
+          body: body,
+          upVotes: upVotes,
+          downVotes: downVotes
         };
 
         return postCollection
@@ -59,8 +61,12 @@ let exportedMethods = {
     return posts().then(postCollection => {
       let updatedPostData = {};
 
-      if (updatedPost.tags) {
-        updatedPostData.tags = updatedPost.tags;
+      if (updatedPost.timestamp) {
+        updatedPostData.timestamp = updatedPost.timestamp;
+      }
+
+      if (updatedPost.posterId) {
+        updatedPostData.posterId = updatedPost.posterId;
       }
 
       if (updatedPost.title) {
@@ -69,6 +75,14 @@ let exportedMethods = {
 
       if (updatedPost.body) {
         updatedPostData.body = updatedPost.body;
+      }
+
+      if (updatedPost.upVotes) {
+        updatedPostData.upVotes = updatedPost.upVotes;
+      }
+
+      if (updatedPost.downVotes) {
+        updatedPostData.downVotes = updatedPost.downVotes;
       }
 
       let updateCommand = {
@@ -81,28 +95,6 @@ let exportedMethods = {
           return this.getPostById(id);
         });
     });
-  },
-  renameTag(oldTag, newTag) {
-    let findDocuments = {
-      tags: oldTag
-    };
-
-    let firstUpdate = {
-      $pull: oldTag
-    };
-
-    let secondUpdate = {
-      $addToSet: newTag
-    };
-
-    return postCollection
-      .updateMany(findDocuments, firstUpdate)
-      .then(result => {
-        return postCollection.updateMany(findDocuments, secondUpdate);
-      })
-      .then(secondUpdate => {
-        return this.getPostsByTag(newTag);
-      });
   }
 };
 

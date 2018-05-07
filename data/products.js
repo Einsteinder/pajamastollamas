@@ -8,9 +8,9 @@ let exportedMethods = {
       return productCollection.find({}).toArray();
     });
   },
-  getProductsByTag(tag) {
+  getProductsByReviewId(reviewId) {
     return products().then(productCollection => {
-      return productCollection.find({ tags: tag }).toArray();
+      return productCollection.find({ reviewId: reviewId }).toArray();
     });
   },
   getProductById(id) {
@@ -73,17 +73,17 @@ let exportedMethods = {
         });
     });
   },
-  renameTag(oldTag, newTag) {
+  updateReviewId(oldReviewId, newReviewId) {
     let findDocuments = {
-      tags: oldTag
+      reviewId: oldReviewId
     };
 
     let firstUpdate = {
-      $pull: oldTag
+      $pull: oldReviewId
     };
 
     let secondUpdate = {
-      $addToSet: newTag
+      $addToSet: newReviewId
     };
 
     return productCollection
@@ -92,7 +92,7 @@ let exportedMethods = {
         return productCollection.updateMany(findDocuments, secondUpdate);
       })
       .then(secondUpdate => {
-        return this.getProductsByTag(newTag);
+        return this.getProductsByReviewId(newReviewId);
       });
   }
 };

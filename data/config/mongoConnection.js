@@ -3,7 +3,7 @@ const MongoClient = require("mongodb").MongoClient;
 const settings = {
   mongoConfig: {
     serverUrl: "mongodb://localhost:27017/",
-    database: "advancedApiBasedBlog"
+    database: "pajamastollamas"
   }
 };
 
@@ -14,6 +14,7 @@ let _connection = undefined;
 let connectDb = () => {
   if (!_connection) {
     _connection = MongoClient.connect(fullMongoUrl).then(db => {
+      console.log("Database Connection Established on port 27017");
       return db;
     });
   }

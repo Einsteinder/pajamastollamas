@@ -1,111 +1,86 @@
 const mongoCollections = require("./config/mongoCollections");
-const posts = mongoCollections.posts;
+const reviews = mongoCollections.reviews;
 const products = require("./products");
 const uuid = require("node-uuid");
 
 let exportedMethods = {
-  getAllPosts() {
-    return posts().then(postCollection => {
-      return postCollection.find({}).toArray();
+  getAllReviews() {
+    return reviews().then(reviewCollection => {
+      return reviewCollection.find({}).toArray();
     });
   },
-  getPostsByTag(tag) {
-    return posts().then(postCollection => {
-      return postCollection.find({ tags: tag }).toArray();
+  getReviewsByUserId(id) {
+    return reviews().then(reviewCollection => {
+      return reviewCollection.find({ userId: userId }).toArray();
     });
   },
-  getPostById(id) {
-    return posts().then(postCollection => {
-      return postCollection.findOne({ _id: id }).then(post => {
-        if (!post) throw "Post not found";
-        return post;
+  getReviewById(id) {
+    return reviews().then(reviewCollection => {
+      return reviewCollection.findOne({ _id: id }).then(review => {
+        if (!review) throw "Review not found";
+        return review;
       });
     });
   },
-  addPost(title, body, tags, posterId) {
-    return posts().then(postCollection => {
-      return products.getUserById(posterId).then(userThatPosted => {
-        let newPost = {
+  addReview(title, body, tags, ReviewerId) {
+    return reviews().then(reviewCollection => {
+      return products.getUserById(reviewerId).then(userThatReviewed => {
+        let newReview = {
           _id: uuid.v4(),
-          title: title,
           body: body,
-          posterId: posterId,
-          name: `${userThatPosted.firstName} ${userThatPosted.lastName}`,
-          products: products,
-          tags: tags,
+          userId: userId,
+          name: `${userThatReviewed.nickname}`,
+          productId: productId,
           timestamp: timestamp,
-          rate: rate,
         };
 
-        return postCollection
-          .insertOne(newPost)
+        return reviewCollection
+          .insertOne(newReview)
           .then(newInsertInformation => {
             return newInsertInformation.insertedId;
           })
           .then(newId => {
-            return this.getPostById(newId);
+            return this.getReviewById(newId);
           });
       });
     });
   },
-  removePost(id) {
-    return posts().then(postCollection => {
-      return postCollection.removeOne({ _id: id }).then(deletionInfo => {
+  removeReview(id) {
+    return reviews().then(reviewCollection => {
+      return reviewCollection.removeOne({ _id: id }).then(deletionInfo => {
         if (deletionInfo.deletedCount === 0) {
-          throw `Could not delete post with id of ${id}`;
+          throw `Could not delete Review with id of ${id}`;
         } else {
         }
       });
     });
   },
-  updatePost(id, updatedPost) {
-    return posts().then(postCollection => {
-      let updatedPostData = {};
+  updateReview(id, updatedReview) {
+    return reviews().then(reviewCollection => {
+      let updatedReviewData = {};
 
-      if (updatedPost.tags) {
-        updatedPostData.tags = updatedPost.tags;
+      if (updatedReview.body) {
+        updatedReviewData.body = updatedReview.body;
       }
 
-      if (updatedPost.title) {
-        updatedPostData.title = updatedPost.title;
+      if (updatedReview.name){
+        updatedReviewData.name = updatedReview.name;
       }
 
-      if (updatedPost.body) {
-        updatedPostData.body = updatedPost.body;
+      if (updatedReview.userId){
+        updatedReviewData.userId = updatedReview.userId;
       }
 
       let updateCommand = {
-        $set: updatedPostData
+        $set: updatedReviewData
       };
 
-      return postCollection
+      return reviewCollection
         .updateOne({ _id: id }, updateCommand)
         .then(result => {
-          return this.getPostById(id);
+          return this.getReviewById(id);
         });
     });
-  },
-  renameTag(oldTag, newTag) {
-    let findDocuments = {
-      tags: oldTag
-    };
-
-    let firstUpdate = {
-      $pull: oldTag
-    };
-
-    let secondUpdate = {
-      $addToSet: newTag
-    };
-
-    return postCollection
-      .updateMany(findDocuments, firstUpdate)
-      .then(result => {
-        return postCollection.updateMany(findDocuments, secondUpdate);
-      })
-      .then(secondUpdate => {
-        return this.getPostsByTag(newTag);
-      });
   }
 };
 

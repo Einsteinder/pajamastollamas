@@ -1,7 +1,6 @@
 const mongoCollections = require("./config/mongoCollections");
 const users = mongoCollections.users;
 const uuid = require("node-uuid");
-
 let exportedMethods = {
   getAllUsers() {
     return users().then(userCollection => {
@@ -19,16 +18,26 @@ let exportedMethods = {
       });
     });
   },
-  addUser(firstName, lastName) {
+  getUserByUsername(username) {
+		return users().then((collection)=> {
+			return collection.findOne({username: username}).then((user)=> {
+				if (user) {
+					user.isadmin = false;
+					return user;
+				} else {
+          throw "User not found";
+				}
+			});
+		});
+	},
+  addUser(userInfo) {
     return users().then(userCollection => {
       let newUser = {
-        firstName: firstName,
-        lastName: lastName,
+        nickName: userInfo.nickName,
         _id: uuid.v4(),
-        username: username,
-        password: password, 
+        userName: userInfo.userName,
+        password: userInfo.password, 
         posts: [],
-        products:[],
         reviews:[]
       };
 
@@ -54,10 +63,9 @@ let exportedMethods = {
   updateUser(id, updatedUser) {
     return this.getUserById(id).then(currentUser => {
       let updatedUser = {
-        firstName: updatedUser.firstName,
-        lastName: updatedUser.lastName
+        nickName: updatedUser.nickName,
+        userName: updatedUser.userName
       };
-
       let updateCommand = {
         $set: updatedUser
       };
@@ -67,6 +75,7 @@ let exportedMethods = {
       });
     });
   },
+  
   addPostToUser(userId, postId, postTitle) {
     return this.getUserById(id).then(currentUser => {
       return userCollection.updateOne(
