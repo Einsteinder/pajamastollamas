@@ -4,7 +4,7 @@ const users = data.users;
 const items = data.products;
 const icomments = data.review;
 const fposts = data.posts;
-//const fcomments = require ( "../data/reviews" );
+const fcomments = data.postComments;
 const elasticsearch = require('elasticsearch');
 const esclient = new elasticsearch.Client({
   host: 'localhost:9200'
@@ -43,7 +43,7 @@ amqp.connect('amqp://localhost', (err, conn) => {
         ch.consume(q, async function reply(msg) {
             var id = parseInt(msg.content.toString());
             try {
-                var r = [];
+                var r = await fcomments.getPostCommentsById ( id );
             } catch ( err ) {
                 console.log ( err );
                 ch.sendToQueue(msg.properties.replyTo, new Buffer("⟂"), {correlationId: msg.properties.correlationId});
@@ -265,10 +265,9 @@ amqp.connect('amqp://localhost', (err, conn) => {
         console.log(' [x] Post User - Waiting');
         ch.consume(q, async function reply(msg) {
             var n = JSON.parse(msg.content.toString());
-            var enpassword = bcrypt.hashSync(n.password);
             var userInfo = {
                 userName: n.email,
-                password: enpassword,
+                password: n.password,
                 nickName: n.nickname
             }
             var r = await users.addUser(userInfo);//await data.users.create
@@ -285,8 +284,14 @@ amqp.connect('amqp://localhost', (err, conn) => {
         ch.prefetch(1);
         console.log(' [x] Post Admin - Waiting');
         ch.consume(q, async function reply(msg) {
-            var n = msg.content.toString();
-            var r = {n,k:true};//await data.elevateadmin
+            var id = JSON.parse(msg.content.toString());
+            try {
+                var r = await users.updateUser ( id, { admin: 2 } )
+            } catch ( err ) {
+                ch.sendToQueue(msg.properties.replyTo, new Buffer("⟂"), {correlationId: msg.properties.correlationId});
+                ch.ack(msg);
+                return;
+            }
             ch.sendToQueue(msg.properties.replyTo, new Buffer(JSON.stringify(r)), {correlationId: msg.properties.correlationId});
             ch.ack(msg);
         });

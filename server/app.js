@@ -1,9 +1,13 @@
 const express = require ( "express" );
 const bodyParser = require ( "body-parser" );
-/* const db = require("../data");
-const session = require("express-session");
+const cookieParser = require ( "cookie-parser" );
+const db = require("../data");
+/*const session = require("express-session");*/
 const redis = require("redis");
-const passport = require("passport");
+const bluebird = require ( "bluebird" ); //For promisfy-ing the redis client
+bluebird.promisifyAll(redis.RedisClient.prototype);
+const client = redis.createClient();
+/*const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
 
 passport.use(new LocalStrategy(
@@ -30,8 +34,18 @@ passport.deserializeUser(function(id, done) {
 });
  */
 let app = express();
+app.use ( cookieParser() );
 app.use ( bodyParser.json() );
 app.use(express.static('static'))
+
+async function sessionValid ( sessionkey ) {
+    if ( 1 == await client.existsAsync ( sessionkey) ) {
+        return await client.getAsync ( sessionkey )
+    } else {
+        return 0;
+    }
+}
+
 //app.use(passport.initialize());
 //var redisStore = require('connect-redis')(express);
 //var rClient = redis.createClient();
@@ -240,8 +254,8 @@ app.get ( "/items/search/:query", ( req, res ) => {
 // POSTS
 
 // Make a new forum post
-app.post ( "/forum/", ( req, res ) => {
-    if (!req.session) {
+app.post ( "/forum/", async ( req, res ) => {
+    if (!req.cookies.sessionId || !(await sessionValid(req.cookies.sessionId))) {
         res.status(400).send({ message: 'Session Expired'}) // handle error
     }
     let body = req.body;
@@ -260,8 +274,8 @@ app.post ( "/forum/", ( req, res ) => {
 });
 
 // Make a new comment on forum post :id
-app.post ( "/forum/comments/:id", ( req, res ) => {
-    if (!req.session) {
+app.post ( "/forum/comments/:id", async ( req, res ) => {
+    if (!req.cookies.sessionId || !(await sessionValid(req.cookies.sessionId))) {
         res.status(400).send({ message: 'Session Expired'}) // handle error
     }
     let id = req.params.id;
@@ -280,8 +294,8 @@ app.post ( "/forum/comments/:id", ( req, res ) => {
     });
 });
 
-app.post ( "/forum/comments/rating/:id", (req, res) => {
-    if ( !req.session ) {
+app.post ( "/forum/comments/rating/:id", async (req, res) => {
+    if ( !req.cookies.sessionId || !(await sessionValid(req.cookies.sessionId)) ) {
         res.status ( 400 ).send ({message: "Session Expired"});
     }
     let id = req.params.id;
@@ -301,8 +315,8 @@ app.post ( "/forum/comments/rating/:id", (req, res) => {
 });
 
 // Make a rate on forum post :id (body should be +/- 1)
-app.post ( "/forum/rating/:id", ( req, res ) => {
-    if (!req.session) {
+app.post ( "/forum/rating/:id", async ( req, res ) => {
+    if (!req.cookies.sessionId || !(await sessionValid(req.cookies.sessionId))) {
         res.status(400).send({ message: 'Session Expired'}) // handle error
     }
     let id = req.params.id;
@@ -323,7 +337,7 @@ app.post ( "/forum/rating/:id", ( req, res ) => {
 
 // Make a new item
 app.post ( "/item/", async ( req, res ) => {
-    if (!req.session) {
+    if (!req.cookies.sessionId || !(await sessionValid(req.cookies.sessionId))) {
         res.status(400).send({ message: 'Session Expired'}) // handle error
     }
     let body = req.body;
@@ -343,7 +357,7 @@ app.post ( "/item/", async ( req, res ) => {
 
 // Make a new comment on item :id
 app.post ( "/item/comments/:id", async ( req, res ) => {
-    if (!req.session) {
+    if (!req.cookies.sessionId || !(await sessionValid(req.cookies.sessionId))) {
         res.status(400).send({ message: 'Session Expired'}) // handle error
     }
     let id = req.params.id;
@@ -364,7 +378,7 @@ app.post ( "/item/comments/:id", async ( req, res ) => {
 
 // Make a new user
 app.post ( "/user/", async ( req, res ) => {
-    if (!req.session) {
+    if (!req.cookies.sessionId || !(await sessionValid(req.cookies.sessionId))) {
         res.status(400).send({ message: 'Session Expired'}) // handle error
     }
     let body = req.body;
@@ -384,7 +398,7 @@ app.post ( "/user/", async ( req, res ) => {
 
 // Make a new admin for user :id
 app.post ( "/admin/:id", async ( req, res ) => {
-    if (!req.session) {
+    if (!req.cookies.sessionId || !(await sessionValid(req.cookies.sessionId))) {
         res.status(400).send({ message: 'Session Expired'}) // handle error
     }
     let id = req.params.id;
@@ -407,13 +421,19 @@ app.post ( "/login", async ( req, res ) => {
     let body = req.body;
     let username = body.username;
     let hPass = body.password;
-    ///// Needs to be modified
-    /* passport.authenticate('local', (err, user, info) => {
-        if (err) {
-            res.status(400).send(err);
-        }
-        res.status(200).send(user.id);
-    }); */
+    if ( req.cookies.sessionId ) {
+        res.clearCookie("sessionId");
+    }
+    let user = await db.users.getUserByUsername(username)
+    if ( bcrypt.compareSync(hPass,user.enpassword) ) {
+        let id = generateUuid();
+        let i = (user.admin || 1);
+        await redis.setAsync ( id, i, "EX", 60 * 60 );
+        res.cookie( "sessionId",id,{ expires: d } );
+        res.status(200).send(i);
+    } else {
+        res.status(400).send ( {message: "Error - Login Invalid"} );
+    }
     
 });
 
