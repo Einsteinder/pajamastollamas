@@ -1,5 +1,5 @@
 import { connect } from 'react-redux'
-import {fetchProducts } from '../actions'
+import {fetchproducts } from '../actions'
 import Products from '../components/Products';
 
 
@@ -10,7 +10,7 @@ const mapStateToProps = state => (
   })
 
 const mapDispatchToProps = (dispatch) => ({
-    fetchProducts: () =>dispatch(fetchProducts()),
+  fetchproducts: () =>dispatch(fetchproducts()),
   })
 
   export default connect(

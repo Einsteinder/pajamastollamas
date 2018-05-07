@@ -1,5 +1,5 @@
 
-import {Button,Container, Header,Comment,Form } from 'semantic-ui-react'
+import {Button,Container, Header,Comment,Form,Icon } from 'semantic-ui-react'
 import React, { Component } from 'react';
 import './App.css';
 import 'antd/dist/antd.css';
@@ -48,11 +48,13 @@ class Postdetail extends Component {
     <p>{this.props.posts.filter(post=>(post.id===this.props.postId)).map(post=>post.content)}</p>
     <Comment.Group>
 
+                <Icon name="like outline" color="blue" size="huge"/>
+                <Icon name="dislike outline" size="huge"/>
 
 <Header as='h3' dividing>Comments</Header>
 
     {this.props.comments.filter(comment=>comment.parentId===this.props.postId).map(review=>
-    <Comment key={review.id}>
+    <Comment key={review.id} >
   <Comment.Content>
     <Comment.Author>{review.author}</Comment.Author>
     <Comment.Metadata>

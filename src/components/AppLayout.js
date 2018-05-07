@@ -46,10 +46,10 @@ class AppLayout extends Component {
                         </Navbar.Header>
                         <Navbar.Collapse>
                             <Nav >
-                                <NavItem eventKey={1} href="/products">
+                                <NavItem className = "barfont" eventKey={1} href="/products">
                                    Products
                                 </NavItem>
-                                <NavItem eventKey={2} href="/forum">
+                                <NavItem className = "barfont" eventKey={2} href="/forum">
                                    Forum
                                 </NavItem>
                                 <NavItem >
@@ -77,7 +77,7 @@ class AppLayout extends Component {
                                     visible={this.state.login_visible}
                                     onVisibleChange={this.handleVisibleChange}
                                 >
-                                    <NavItem eventKey={1} >
+                                    <NavItem  className = "barfont" eventKey={1} >
                                         Login
     </NavItem>
                                 </Popover>
@@ -88,7 +88,7 @@ class AppLayout extends Component {
                                     visible={this.state.signup_visible}
                                     onVisibleChange={this.handleSingUpVisibleChange}
                                 >
-                                    <NavItem eventKey={2} href="#">
+                                    <NavItem  className = "barfont" eventKey={2} href="#">
                                         Sign up
     </NavItem>
                                 </Popover>
@@ -105,7 +105,7 @@ class AppLayout extends Component {
                         <div style={{ background: '#fff', padding: 24, minHeight: 280 }}>{this.props.content}</div>
                     </Content>
 
-                    <Footer style={{ textAlign: 'center' }}>
+                    <Footer style={{ textAlign: 'center' }} id = "bottom">
                         Pajamas to Llamas ©2018 Created by Cowboys of Gilead
   </Footer>
                 </Layout>

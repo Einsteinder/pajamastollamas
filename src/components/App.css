@@ -58,6 +58,10 @@ body {
   min-height: 70px;
 }
 
+.barfont{
+  font-size: 1.6em ;
+}
+
 .navbar-brand {
   padding: 0 15px;
   height: 70px;

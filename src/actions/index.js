@@ -68,6 +68,33 @@ export function postPost(post) {
 }
 
 
+export function addLike(id) {
+  return {
+      type: 'ADD_LIKE',
+      id
+  };
+}
+
+
+
+export function handlelike(id) {
+  return (dispatch)=>{
+
+    var promise1 = new Promise(function(resolve, reject) {
+      setTimeout(resolve, 1000, "post comment successfully");
+    });
+    promise1.then((response)=>{
+
+      dispatch(addLike(id));
+
+    })
+
+
+};
+}
+
+
+
 
 export function postPostComment(comment) {
 
@@ -147,7 +174,7 @@ export const fetchProductComments =() =>{
 }
 
 
-export const fetchProducts =() =>{
+export const fetchproducts =() =>{
   let products=[{
     imgURL:"https://d39rqydp4iuyht.cloudfront.net/store/product/165250/1000x1000/51810_MN.jpg",
     name:"Loving Paws",
