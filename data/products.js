@@ -23,16 +23,24 @@ let exportedMethods = {
   },
   addProduct(name, description, tags, price, imageSrc) {
     return products().then(productCollection => {
-      return products.getUserById(productId).then( product => {
+      return products.getProductById(productId).then( product => {
         let newProduct = {
           _id: uuid.v4(),
           name: name,
           description: description,
-          tags: tags,
           imageSrc: imageSrc,
           price:price,
           reviews:[]
         };
+
+        return productCollection
+        .insertOne(newProduct)
+        .then(newInsertInformation => {
+          return newInsertInformation.insertedId;
+        })
+        .then(newId => {
+          return this.getProductById(newId);
+        });
       });
     });
   },
