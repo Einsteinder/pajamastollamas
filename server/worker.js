@@ -4,14 +4,15 @@ const users = data.users;
 const items = data.products;
 const icomments = data.review;
 const fposts = data.posts;
-const bcrypt = require("bcrypt");
 //const fcomments = require ( "../data/reviews" );
-/* const elasticsearch = require('elasticsearch');
+const elasticsearch = require('elasticsearch');
 const esclient = new elasticsearch.Client({
   host: 'localhost:9200'
-}); */
+});
+
 
 amqp.connect('amqp://localhost', (err, conn) => {
+    // Get A forum post
     conn.createChannel(function(err, ch) {
         var q = 'get_forum_post';
     
@@ -31,6 +32,7 @@ amqp.connect('amqp://localhost', (err, conn) => {
             ch.ack(msg);
         });
     });
+    // gets comments on a forum post
     conn.createChannel(function(err, ch) {
         var q = 'get_forum_comments';
     
@@ -51,6 +53,7 @@ amqp.connect('amqp://localhost', (err, conn) => {
             ch.ack(msg);
         });
     });
+    // gets comments on an item
     conn.createChannel(function(err, ch) {
         var q = 'get_item_comments';
     
@@ -71,6 +74,7 @@ amqp.connect('amqp://localhost', (err, conn) => {
             ch.ack(msg);
         });
     });
+    // gets an item
     conn.createChannel(function(err, ch) {
         var q = 'get_item';
     
@@ -91,6 +95,7 @@ amqp.connect('amqp://localhost', (err, conn) => {
             ch.ack(msg);
         });
     });
+    // gets all items
     conn.createChannel(function(err, ch) {
         var q = 'get_all_items';
     
@@ -111,6 +116,7 @@ amqp.connect('amqp://localhost', (err, conn) => {
             ch.ack(msg);
         });
     });
+    // gets all forum posts
     conn.createChannel(function(err, ch) {
         var q = 'get_all_forum_posts';
     
@@ -131,6 +137,7 @@ amqp.connect('amqp://localhost', (err, conn) => {
             ch.ack(msg);
         });
     });
+    // gets a user info
     conn.createChannel(function(err, ch) {
         var q = 'get_user';
     
@@ -151,6 +158,7 @@ amqp.connect('amqp://localhost', (err, conn) => {
             ch.ack(msg);
         });
     });
+    //Creates a forum post
     conn.createChannel(function(err, ch) {
         var q = 'post_forum_post';
     
@@ -171,6 +179,7 @@ amqp.connect('amqp://localhost', (err, conn) => {
             ch.ack(msg);
         });
     });
+    // Creates a forum comment
     conn.createChannel(function(err, ch) {
         var q = 'post_forum_comment';
     
@@ -184,6 +193,7 @@ amqp.connect('amqp://localhost', (err, conn) => {
             ch.ack(msg);
         });
     });
+    // rates a forum post
     conn.createChannel(function(err, ch) {
         var q = 'post_forum_rating';
     
@@ -197,6 +207,7 @@ amqp.connect('amqp://localhost', (err, conn) => {
             ch.ack(msg);
         });
     });
+    // Creates an item
     conn.createChannel(function(err, ch) {
         var q = 'post_item';
     
@@ -210,6 +221,7 @@ amqp.connect('amqp://localhost', (err, conn) => {
             ch.ack(msg);
         });
     });
+    // Creates a comment on an item
     conn.createChannel(function(err, ch) {
         var q = 'post_item_comment';
     
@@ -223,6 +235,7 @@ amqp.connect('amqp://localhost', (err, conn) => {
             ch.ack(msg);
         });
     });
+    // Creates a user
     conn.createChannel(function(err, ch) {
         var q = 'post_user';
     
@@ -233,9 +246,9 @@ amqp.connect('amqp://localhost', (err, conn) => {
             var n = JSON.parse(msg.content.toString());
             var enpassword = bcrypt.hashSync(n.password);
             var userInfo = {
-                userName = n.email,
-                password = enpassword,
-                nickName = n.nickname
+                userName: n.email,
+                password: enpassword,
+                nickName: n.nickname
             }
             var r = await users.addUser(userInfo);//await data.users.create
 
@@ -243,6 +256,7 @@ amqp.connect('amqp://localhost', (err, conn) => {
             ch.ack(msg);
         });
     });
+    // Elevates user to admin
     conn.createChannel(function(err, ch) {
         var q = 'post_admin';
     
@@ -256,6 +270,7 @@ amqp.connect('amqp://localhost', (err, conn) => {
             ch.ack(msg);
         });
     });
+    // handles login logic
     conn.createChannel(function(err, ch) {
         var q = 'post_login';
     
@@ -274,6 +289,7 @@ amqp.connect('amqp://localhost', (err, conn) => {
             ch.ack(msg);
         });
     });
+    // Searches items for query using elastic search
     conn.createChannel(function(err, ch) {
         var q = 'search_items';
     
@@ -283,10 +299,20 @@ amqp.connect('amqp://localhost', (err, conn) => {
         ch.consume(q, async function reply(msg) {
             var n = msg.content.toString();
 
-            var r = {n,k:true};//await esclient.search({....})
+            var r = {n,k:true};
             
-            ch.sendToQueue(msg.properties.replyTo, new Buffer(JSON.stringify(r)), {correlationId: msg.properties.correlationId});
-            ch.ack(msg);
+            esclient.search ({
+                index: "product",
+                body: { 
+                    query: { "match_all": {} } 
+                }
+            }).then((r) => {
+                ch.sendToQueue(msg.properties.replyTo, new Buffer(JSON.stringify(r.hits.hits)), {correlationId: msg.properties.correlationId});
+                ch.ack(msg);
+            }).catch ( err => {
+                ch.sendToQueue(msg.properties.replyTo, new Buffer("⟂"), {correlationId: msg.properties.correlationId});
+                ch.ack(msg);
+            });
         });
     });
 });
