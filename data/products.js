@@ -39,7 +39,7 @@ let exportedMethods = {
           return newInsertInformation.insertedId;
         })
         .then(newId => {
-          return this.getUserById(newId);
+          return this.getProductById(newId);
         });
       });
     });
