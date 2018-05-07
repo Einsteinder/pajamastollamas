@@ -297,14 +297,12 @@ amqp.connect('amqp://localhost', (err, conn) => {
         ch.prefetch(1);
         console.log(' [x] Search items - Waiting');
         ch.consume(q, async function reply(msg) {
-            var n = msg.content.toString();
-
-            var r = {n,k:true};
+            var query = msg.content.toString();
             
             esclient.search ({
                 index: "product",
                 body: { 
-                    query: { "match_all": {} } 
+                    query: { "match": { desc: `*${query}*` } } 
                 }
             }).then((r) => {
                 ch.sendToQueue(msg.properties.replyTo, new Buffer(JSON.stringify(r.hits.hits)), {correlationId: msg.properties.correlationId});
