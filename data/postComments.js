@@ -1,47 +1,30 @@
 const mongoCollections = require("./config/mongoCollections");
-const posts = mongoCollections.posts;
-const products = require("./products");
+const postComments = mongoCollections.postComments;
+const users = mongoCollections.users;
 const uuid = require("node-uuid");
 
 let exportedMethods = {
-  getAllPosts() {
+    getPostCommentsById(id) {
+        return postComments().then(postCommentsCollection => {
+          return postCommentsCollection.findOne({ _id: id }).then(postComments => {
+            if (!postComments) throw "Post Comment not found";
+            return postComments;
+          });
+        });
+      },
+  
+  addPostComment(postId,title, body, tags, posterId) {
     return posts().then(postCollection => {
-      return postCollection.find({}).toArray();
-    });
-  },
-  getPostsByTitle(title) {
-    return posts().then(postCollection => {
-      return postCollection.find({ title: title }).toArray();
-    });
-  },
-  getPostCommentsByPostId(id) {
-    return post().then(postCollection => {
-      return postCollection.find({ _id: id }).then(post => {
-        if (!post.Comments) return null;
-        return post.Comments;
-      });
-    });
-  },
-  getPostById(id) {
-    return posts().then(postCollection => {
-      return postCollection.findOne({ _id: id }).then(post => {
-        if (!post) throw "Post not found";
-        return post;
-      });
-    });
-  },
-  addPost(title, body, tags, posterId) {
-    return posts().then(postCollection => {
-      return products.getUserById(posterId).then(userThatPosted => {
+      return users.getUserById(posterId).then(userThatPosted => {
         let newPost = {
           _id: uuid.v4(),
+          postId:postId,
           title:title,
           posterId: posterId,
           name: `${userThatPosted.nickName}`,
           timestamp: timestamp,
           body: body,
-          upVotes: upVotes,
-          postComments:[]
+          upVotes: upVotes
         };
 
         return postCollection
@@ -56,13 +39,13 @@ let exportedMethods = {
     });
   },
   incrementUpVotes(id){
-    var post = this.getPostById(id);
+    var post = this.getPostCommentsById(id);
     var updatedUpVotes = post.upVotes;
     $inc: {upVotes:1};
     var newPost = {
       upVotes:updatedUpVotes,
     }
-    this.updatePost(id,newPost)
+    this.updatePostComment(id,newPost)
   },
   removePost(id) {
     return posts().then(postCollection => {
@@ -74,7 +57,7 @@ let exportedMethods = {
       });
     });
   },
-  updatePost(id, updatedPost) {
+  updatePostComment(id, updatedPost) {
     return posts().then(postCollection => {
       let updatedPostData = {};
 
@@ -96,10 +79,6 @@ let exportedMethods = {
 
       if (updatedPost.upVotes) {
         updatedPostData.upVotes = updatedPost.upVotes;
-      }
-
-      if (updatedPost.downVotes) {
-        updatedPostData.downVotes = updatedPost.downVotes;
       }
 
       let updateCommand = {

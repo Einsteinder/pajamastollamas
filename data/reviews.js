@@ -1,6 +1,6 @@
 const mongoCollections = require("./config/mongoCollections");
 const reviews = mongoCollections.reviews;
-const products = require("./products");
+const users = mongoCollections.users;
 const uuid = require("node-uuid");
 
 let exportedMethods = {
@@ -24,7 +24,7 @@ let exportedMethods = {
   },
   addReview(title, body, tags, ReviewerId) {
     return reviews().then(reviewCollection => {
-      return products.getUserById(reviewerId).then(userThatReviewed => {
+      return users.getUserById(reviewerId).then(userThatReviewed => {
         let newReview = {
           _id: uuid.v4(),
           body: body,
