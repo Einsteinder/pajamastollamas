@@ -7,9 +7,9 @@ let getCollectionFn = collection => {
     if (!_col) {
       _col = dbConnection().then(db => {
       db.createCollection(collection,function(err,res){
-          if(err) throw err;
+          if(err) throw err;    
           console.log("Collection created!");
-          return res;
+          return collection;    
         });
       });
     }
