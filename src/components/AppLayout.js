@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import './App.css';
 import 'antd/dist/antd.css';
-import { Popover, Layout, } from 'antd';
+import { Popover, Layout,Icon,Button } from 'antd';
 import { Navbar, Nav, NavItem } from 'react-bootstrap';
 import { Link } from "react-router-dom";
 import Login from './Login';
@@ -14,6 +14,7 @@ class AppLayout extends Component {
     state = {
         login_visible: false,
         signup_visible: false,
+        user:""
 
     }
     hidesignin = () => {
@@ -26,6 +27,9 @@ class AppLayout extends Component {
     }
     handleSingUpVisibleChange = (signup_visible) => {
         this.setState({ signup_visible });
+    }
+    handlelogout=()=>{
+        this.setState({user:""})
     }
     render() {
         return (
@@ -53,7 +57,19 @@ class AppLayout extends Component {
                                 </NavItem>
 
                             </Nav>
-                            <Nav pullRight>
+                            
+                                {(this.state.user)?
+                                    <Nav pullRight>
+                                    <Popover
+                                    content={    <Button onClick={this.handlelogout}>Logout</Button>
+}
+                                  
+                                >
+                                    <NavItem eventKey={1} >
+                                    <Icon type="user" />
+    </NavItem>
+                                </Popover></Nav>: 
+                                <Nav pullRight>
                                 <Popover
                                     content={<Login />}
                                     title="Title"
@@ -78,6 +94,10 @@ class AppLayout extends Component {
                                 </Popover>
 
                             </Nav>
+
+                                
+                               }
+                              
                         </Navbar.Collapse>
                     </Navbar>
                     <Content style={{ padding: '0 50px' }}>
