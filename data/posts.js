@@ -1,6 +1,6 @@
 const mongoCollections = require("./config/mongoCollections");
 const posts = mongoCollections.posts;
-const products = require("./products");
+const users = require("./users");
 const uuid = require("node-uuid");
 
 let exportedMethods = {
@@ -30,9 +30,9 @@ let exportedMethods = {
       });
     });
   },
-  addPost(title, body, tags, posterId) {
+  addPost(title, body, tags, posterId, timestamp, upVotes) {
     return posts().then(postCollection => {
-      return products.getUserById(posterId).then(userThatPosted => {
+      return users.getUserById(posterId).then(userThatPosted => {
         let newPost = {
           _id: uuid.v4(),
           title:title,

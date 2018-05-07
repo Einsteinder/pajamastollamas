@@ -172,8 +172,9 @@ amqp.connect('amqp://localhost', (err, conn) => {
         ch.prefetch(1);
         console.log(' [x] Post Forum Post - Waiting');
         ch.consume(q, async function reply(msg) {
+            var n = JSON.parse(msg.content.toString());
             try {
-                var r = await fposts.getAllPosts();
+                var r = await fposts.addPost ( n.title, n.body, undefined, n.posterId );
             } catch ( err ) {
                 console.log ( err );
                 ch.sendToQueue(msg.properties.replyTo, new Buffer("⟂"), {correlationId: msg.properties.correlationId});

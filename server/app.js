@@ -255,9 +255,9 @@ app.get ( "/items/search/:query", ( req, res ) => {
 
 // Make a new forum post
 app.post ( "/forum/", async ( req, res ) => {
-    if (!req.cookies.sessionId || !(await sessionValid(req.cookies.sessionId))) {
+    /*if (!req.cookies.sessionId || !(await sessionValid(req.cookies.sessionId))) {
         res.status(400).send({ message: 'Session Expired'}) // handle error
-    }
+    }*/
     let body = req.body;
     mqConn.createChannel(function(err, ch) {
         ch.assertQueue('', {exclusive: true}, function(err, q) {
