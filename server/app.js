@@ -181,7 +181,7 @@ app.get ( "/item/:id", async ( req, res ) => {
                     }
                 }
             }, {noAck: true});
-
+            console.log ( itemid );
             ch.sendToQueue('get_item', new Buffer(itemid.toString()), { correlationId: corr, replyTo: q.queue });
         });
     });
@@ -337,9 +337,9 @@ app.post ( "/forum/rating/:id", async ( req, res ) => {
 
 // Make a new item
 app.post ( "/item/", async ( req, res ) => {
-    if (!req.cookies.sessionId || !(await sessionValid(req.cookies.sessionId))) {
+    /* if (!req.cookies.sessionId || !(await sessionValid(req.cookies.sessionId))) {
         res.status(400).send({ message: 'Session Expired'}) // handle error
-    }
+    } */
     let body = req.body;
     mqConn.createChannel(function(err, ch) {
         ch.assertQueue('', {exclusive: true}, function(err, q) {
@@ -440,6 +440,10 @@ app.post ( "/login", async ( req, res ) => {
 app.post ( "/logout", async ( req, res ) => {
     //Handle removing the session key from the store
 });
+
+app.use ( "*", (req, res ) => {
+    res.status(404).send();
+})
 
 // Start Listening for the server
 app.listen ( 5000, () => {
