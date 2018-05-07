@@ -19,8 +19,8 @@ let exportedMethods = {
     });
   },
   getUserByUsername(username) {
-		return users().then((collection)=> {
-			return collection.findOne({username: username}).then((user)=> {
+		return users().then((userCollection)=> {
+			return userCollection.findOne({username: username}).then((user)=> {
 				if (user) {
 					user.isadmin = false;
 					return user;
