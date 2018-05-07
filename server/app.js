@@ -1,6 +1,6 @@
 const express = require ( "express" );
 const bodyParser = require ( "body-parser" );
-const db = require("../data");
+/* const db = require("../data");
 const session = require("express-session");
 const redis = require("redis");
 const passport = require("passport");
@@ -28,15 +28,15 @@ passport.deserializeUser(function(id, done) {
         done(null, user);
     });
 });
-
+ */
 let app = express();
 app.use ( bodyParser.json() );
 app.use(express.static('static'))
-app.use(passport.initialize());
-var redisStore = require('connect-redis')(express);
-var rClient = redis.createClient();
+//app.use(passport.initialize());
+//var redisStore = require('connect-redis')(express);
+//var rClient = redis.createClient();
 
-app.use(session({
+/* app.use(session({
         id:uuid.v4(),
         secret:'secret',
         store: new redisStore({
@@ -47,7 +47,7 @@ app.use(session({
         }),
         saveUninitialized:false,
         resave:false
-}));
+})); */
 
 const amqp = require ( "amqplib/callback_api" );
 let mqConn = undefined;
@@ -72,7 +72,12 @@ app.get ( "/forum/:id", ( req, res ) => {
             var corr = generateUuid();
             ch.consume(q.queue, function(msg) {
                 if (msg.properties.correlationId === corr) {
-                    res.status(200).send(msg.content);
+                    msg = msg.content.toString();
+                    if ( msg == "⟂") {
+                        res.status(404).send({message: "Error"});
+                    } else {
+                        res.status(200).send(msg);
+                    }
                 }
             }, {noAck: true});
 
@@ -88,7 +93,12 @@ app.get ( "/forum/", ( req, res ) => {
             var corr = generateUuid();
             ch.consume(q.queue, function(msg) {
                 if (msg.properties.correlationId === corr) {
-                    res.status(200).send(msg.content);
+                    msg = msg.content.toString();
+                    if ( msg == "⟂") {
+                        res.status(404).send({message: "Error"});
+                    } else {
+                        res.status(200).send(msg);
+                    }
                 }
             }, {noAck: true});
 
@@ -105,7 +115,12 @@ app.get ( "/forum/comments/:id", ( req, res ) => {
             var corr = generateUuid();
             ch.consume(q.queue, function(msg) {
                 if (msg.properties.correlationId === corr) {
-                    res.status(200).send(msg.content);
+                    msg = msg.content.toString();
+                    if ( msg == "⟂") {
+                        res.status(404).send({message: "Error"});
+                    } else {
+                        res.status(200).send(msg);
+                    }
                 }
             }, {noAck: true});
 
@@ -122,7 +137,12 @@ app.get ( "/item/comments/:id", async ( req, res ) => {
             var corr = generateUuid();
             ch.consume(q.queue, function(msg) {
                 if (msg.properties.correlationId === corr) {
-                    res.status(200).send(msg.content);
+                    msg = msg.content.toString();
+                    if ( msg == "⟂") {
+                        res.status(404).send({message: "Error"});
+                    } else {
+                        res.status(200).send(msg);
+                    }
                 }
             }, {noAck: true});
 
@@ -139,7 +159,12 @@ app.get ( "/item/:id", async ( req, res ) => {
             var corr = generateUuid();
             ch.consume(q.queue, function(msg) {
                 if (msg.properties.correlationId === corr) {
-                    res.status(200).send(msg.content);
+                    msg = msg.content.toString();
+                    if ( msg == "⟂") {
+                        res.status(404).send({message: "Error"});
+                    } else {
+                        res.status(200).send(msg);
+                    }
                 }
             }, {noAck: true});
 
@@ -155,7 +180,12 @@ app.get ( "/items/", async ( req, res ) => {
             var corr = generateUuid();
             ch.consume(q.queue, function(msg) {
                 if (msg.properties.correlationId === corr) {
-                    res.status(200).send(msg.content);
+                    msg = msg.content.toString();
+                    if ( msg == "⟂") {
+                        res.status(404).send({message: "Error"});
+                    } else {
+                        res.status(200).send(msg);
+                    }
                 }
             }, {noAck: true});
 
@@ -173,7 +203,7 @@ app.get ( "/user/:id", async ( req, res ) => {
             ch.consume(q.queue, function(msg) {
                 if (msg.properties.correlationId === corr) {
                     if ( msg.content == "⟂" ) {
-                        res.status(404).send("User Not Found");    
+                        res.status(404).send("Error");    
                     } else {
                         res.status(200).send(msg.content);
                     }
@@ -193,7 +223,12 @@ app.get ( "/items/search/:query", ( req, res ) => {
             var corr = generateUuid();
             ch.consume(q.queue, function(msg) {
                 if (msg.properties.correlationId === corr) {
-                    res.status(200).send(msg.content);
+                    msg = msg.content.toString();
+                    if ( msg == "⟂") {
+                        res.status(404).send({message: "Error"});
+                    } else {
+                        res.status(200).send(msg);
+                    }
                 }
             }, {noAck: true});
 
@@ -241,6 +276,26 @@ app.post ( "/forum/comments/:id", ( req, res ) => {
             }, {noAck: true});
 
             ch.sendToQueue('post_forum_comment', new Buffer(JSON.stringify({body, id})), { correlationId: corr, replyTo: q.queue });
+        });
+    });
+});
+
+app.post ( "/forum/comments/rating/:id", (req, res) => {
+    if ( !req.session ) {
+        res.status ( 400 ).send ({message: "Session Expired"});
+    }
+    let id = req.params.id;
+    let body = req.body;
+    mqConn.createChannel(function(err, ch) {
+        ch.assertQueue('', {exclusive: true}, function(err, q) {
+            var corr = generateUuid();
+            ch.consume(q.queue, function(msg) {
+                if (msg.properties.correlationId === corr) {
+                    res.status(200).send(msg.content);
+                }
+            }, {noAck: true});
+
+            ch.sendToQueue('post_forum_comment_rating', new Buffer(JSON.stringify({body, id})), { correlationId: corr, replyTo: q.queue });
         });
     });
 });
@@ -352,18 +407,13 @@ app.post ( "/login", async ( req, res ) => {
     let body = req.body;
     let username = body.username;
     let hPass = body.password;
-    mqConn.createChannel(function(err, ch) {
-        ch.assertQueue('', {exclusive: true}, function(err, q) {
-            var corr = generateUuid();
-            ch.consume(q.queue, function(msg) {
-                if (msg.properties.correlationId === corr) {
-                    res.status(200).send(parseInt(msg.content));
-                }
-            }, {noAck: true});
-
-            ch.sendToQueue('post_login', new Buffer(JSON.stringify({username, hPass})), { correlationId: corr, replyTo: q.queue });
-        });
-    });
+    ///// Needs to be modified
+    /* passport.authenticate('local', (err, user, info) => {
+        if (err) {
+            res.status(400).send(err);
+        }
+        res.status(200).send(user.id);
+    }); */
     
 });
 
