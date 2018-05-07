@@ -1,10 +1,10 @@
 const express = require ( "express" );
 const bodyParser = require ( "body-parser" );
-const db = require("./data");
+const db = require("../data");
 const session = require("express-session");
 const redis = require("redis");
 const passport = require("passport");
-const localStrategy = require("passport-local").Strategy;
+const LocalStrategy = require("passport-local").Strategy;
 
 passport.use(new LocalStrategy(
     function(username, password, done) {
@@ -66,9 +66,6 @@ function generateUuid() {
 
 // Gets a forum post ":id"
 app.get ( "/forum/:id", ( req, res ) => {
-    if (!req.session) {
-        return next(new Error('Session Expired')) // handle error
-      }
     let id = req.params.id;
     mqConn.createChannel(function(err, ch) {
         ch.assertQueue('', {exclusive: true}, function(err, q) {
@@ -86,9 +83,6 @@ app.get ( "/forum/:id", ( req, res ) => {
 
 // Gets all forum posts
 app.get ( "/forum/", ( req, res ) => {
-    if (!req.session) {
-        return next(new Error('Session Expired')) // handle error
-      }
     mqConn.createChannel(function(err, ch) {
         ch.assertQueue('', {exclusive: true}, function(err, q) {
             var corr = generateUuid();
@@ -105,9 +99,6 @@ app.get ( "/forum/", ( req, res ) => {
 
 // Gets the comments for post :id
 app.get ( "/forum/comments/:id", ( req, res ) => {
-    if (!req.session) {
-        return next(new Error('Session Expired')) // handle error
-      }
     let id = req.params.id;
     mqConn.createChannel(function(err, ch) {
         ch.assertQueue('', {exclusive: true}, function(err, q) {
@@ -125,9 +116,6 @@ app.get ( "/forum/comments/:id", ( req, res ) => {
 
 // Gets the comments for item :id
 app.get ( "/item/comments/:id", async ( req, res ) => {
-    if (!req.session) {
-        return next(new Error('Session Expired')) // handle error
-      }
     let itemid = req.params.id;
     mqConn.createChannel(function(err, ch) {
         ch.assertQueue('', {exclusive: true}, function(err, q) {
@@ -145,9 +133,6 @@ app.get ( "/item/comments/:id", async ( req, res ) => {
 
 // Gets the item :id
 app.get ( "/item/:id", async ( req, res ) => {
-    if (!req.session) {
-        return next(new Error('Session Expired')) // handle error
-      }
     let itemid = req.params.id;
     mqConn.createChannel(function(err, ch) {
         ch.assertQueue('', {exclusive: true}, function(err, q) {
@@ -165,9 +150,6 @@ app.get ( "/item/:id", async ( req, res ) => {
 
 // Gets all items
 app.get ( "/items/", async ( req, res ) => {
-    if (!req.session) {
-        return next(new Error('Session Expired')) // handle error
-      }
     mqConn.createChannel(function(err, ch) {
         ch.assertQueue('', {exclusive: true}, function(err, q) {
             var corr = generateUuid();
@@ -184,9 +166,6 @@ app.get ( "/items/", async ( req, res ) => {
 
 // Gets the user with id :id
 app.get ( "/user/:id", async ( req, res ) => {
-    if (!req.session) {
-        return next(new Error('Session Expired')) // handle error
-      }
     let id = req.params.id;
     mqConn.createChannel(function(err, ch) {
         ch.assertQueue('', {exclusive: true}, function(err, q) {
@@ -208,9 +187,6 @@ app.get ( "/user/:id", async ( req, res ) => {
 
 // Gets the items matching the search term :query
 app.get ( "/items/search/:query", ( req, res ) => {
-    if (!req.session) {
-        return next(new Error('Session Expired')) // handle error
-      }
     let query = req.params.query;
     mqConn.createChannel(function (err, ch) {
         ch.assertQueue('', {exclusive: true}, function(err, q) {
@@ -231,8 +207,8 @@ app.get ( "/items/search/:query", ( req, res ) => {
 // Make a new forum post
 app.post ( "/forum/", ( req, res ) => {
     if (!req.session) {
-        return next(new Error('Session Expired')) // handle error
-      }
+        res.status(400).send({ message: 'Session Expired'}) // handle error
+    }
     let body = req.body;
     mqConn.createChannel(function(err, ch) {
         ch.assertQueue('', {exclusive: true}, function(err, q) {
@@ -251,8 +227,8 @@ app.post ( "/forum/", ( req, res ) => {
 // Make a new comment on forum post :id
 app.post ( "/forum/comments/:id", ( req, res ) => {
     if (!req.session) {
-        return next(new Error('Session Expired')) // handle error
-      }
+        res.status(400).send({ message: 'Session Expired'}) // handle error
+    }
     let id = req.params.id;
     let body = req.body;
     mqConn.createChannel(function(err, ch) {
@@ -272,8 +248,8 @@ app.post ( "/forum/comments/:id", ( req, res ) => {
 // Make a rate on forum post :id (body should be +/- 1)
 app.post ( "/forum/rating/:id", ( req, res ) => {
     if (!req.session) {
-        return next(new Error('Session Expired')) // handle error
-      }
+        res.status(400).send({ message: 'Session Expired'}) // handle error
+    }
     let id = req.params.id;
     let body = req.body;
     mqConn.createChannel(function(err, ch) {
@@ -293,8 +269,8 @@ app.post ( "/forum/rating/:id", ( req, res ) => {
 // Make a new item
 app.post ( "/item/", async ( req, res ) => {
     if (!req.session) {
-        return next(new Error('Session Expired')) // handle error
-      }
+        res.status(400).send({ message: 'Session Expired'}) // handle error
+    }
     let body = req.body;
     mqConn.createChannel(function(err, ch) {
         ch.assertQueue('', {exclusive: true}, function(err, q) {
@@ -313,8 +289,8 @@ app.post ( "/item/", async ( req, res ) => {
 // Make a new comment on item :id
 app.post ( "/item/comments/:id", async ( req, res ) => {
     if (!req.session) {
-        return next(new Error('Session Expired')) // handle error
-      }
+        res.status(400).send({ message: 'Session Expired'}) // handle error
+    }
     let id = req.params.id;
     let body = req.body;
     mqConn.createChannel(function(err, ch) {
@@ -334,8 +310,8 @@ app.post ( "/item/comments/:id", async ( req, res ) => {
 // Make a new user
 app.post ( "/user/", async ( req, res ) => {
     if (!req.session) {
-        return next(new Error('Session Expired')) // handle error
-      }
+        res.status(400).send({ message: 'Session Expired'}) // handle error
+    }
     let body = req.body;
     mqConn.createChannel(function(err, ch) {
         ch.assertQueue('', {exclusive: true}, function(err, q) {
@@ -354,8 +330,8 @@ app.post ( "/user/", async ( req, res ) => {
 // Make a new admin for user :id
 app.post ( "/admin/:id", async ( req, res ) => {
     if (!req.session) {
-        return next(new Error('Session Expired')) // handle error
-      }
+        res.status(400).send({ message: 'Session Expired'}) // handle error
+    }
     let id = req.params.id;
     mqConn.createChannel(function(err, ch) {
         ch.assertQueue('', {exclusive: true}, function(err, q) {
@@ -373,10 +349,7 @@ app.post ( "/admin/:id", async ( req, res ) => {
 
 // Logins the user with the given information. Creates a session key and returns it
 app.post ( "/login", async ( req, res ) => {
-    if (!req.session) {
-        return next(new Error('Session Expired')) // handle error
-      }
-    let body = req.bod;
+    let body = req.body;
     let username = body.username;
     let hPass = body.password;
     mqConn.createChannel(function(err, ch) {
@@ -384,7 +357,7 @@ app.post ( "/login", async ( req, res ) => {
             var corr = generateUuid();
             ch.consume(q.queue, function(msg) {
                 if (msg.properties.correlationId === corr) {
-                    res.status(200).send(msg.content);
+                    res.status(200).send(parseInt(msg.content));
                 }
             }, {noAck: true});
 
@@ -392,6 +365,10 @@ app.post ( "/login", async ( req, res ) => {
         });
     });
     
+});
+
+app.post ( "/logout", async ( req, res ) => {
+    //Handle removing the session key from the store
 });
 
 // Start Listening for the server
