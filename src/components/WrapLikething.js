@@ -1,18 +1,12 @@
 import React, { Component } from 'react';
 import './App.css';
 import 'antd/dist/antd.css';
-import {Form,Input,Popover, Button, List, Icon  } from 'antd';
+import {List, Icon  } from 'antd';
 import { Link } from "react-router-dom";
-import AppLayout from './AppLayout';
 import { HashLink as LinkH } from 'react-router-hash-link';
 import {handlelike } from '../actions'
 
 import { connect } from 'react-redux'
-
-
-const { TextArea } = Input;
-const FormItem = Form.Item;
-
 
 const IconText = ({ type, text }) => (
   <p>
@@ -24,10 +18,6 @@ const IconText = ({ type, text }) => (
 
 
 class WrapLikething extends Component {
-    state = {
-        currentPost:{}
-      }
-
     handlethislike = () =>{
       this.props.handlelike(this.props.item.id)
       console.log(this.props.item.id)

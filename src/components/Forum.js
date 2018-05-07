@@ -1,23 +1,12 @@
 import React, { Component } from 'react';
 import './App.css';
 import 'antd/dist/antd.css';
-import {Form,Input,Popover, Button, List, Icon  } from 'antd';
-import { Link } from "react-router-dom";
+import {Form,Input,Popover, Button, List  } from 'antd';
 import AppLayout from './AppLayout';
-import { HashLink as LinkH } from 'react-router-hash-link';
 import WrapLikething from './WrapLikething';
 
 const { TextArea } = Input;
 const FormItem = Form.Item;
-
-
-const IconText = ({ type, text }) => (
-  <p>
-    <Icon type={type} style={{ marginRight: 8 }} />
-    {text}
-  </p>
-);
-
 
 
 class Forum extends Component {
