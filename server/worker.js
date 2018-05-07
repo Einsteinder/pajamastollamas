@@ -9,6 +9,11 @@ const elasticsearch = require('elasticsearch');
 const esclient = new elasticsearch.Client({
   host: 'localhost:9200'
 });
+esclient.index({
+    index: 'product',
+    type: 'doc',
+    body: {}
+})
 
 
 amqp.connect('amqp://localhost', (err, conn) => {
@@ -232,6 +237,13 @@ amqp.connect('amqp://localhost', (err, conn) => {
             var n = JSON.parse(msg.content.toString());
             try {
                 var r = await items.addProduct ( n.name, n.description, n.tags, n.imageSrc );
+                esclient.index ({
+                    index: 'product',
+                    type: 'doc',
+                    id: r._id,
+                    body: r
+                });
+                
             } catch ( err ) {
                 console.log ( err );
                 ch.sendToQueue(msg.properties.replyTo, new Buffer("⟂"), {correlationId: msg.properties.correlationId});
@@ -309,12 +321,16 @@ amqp.connect('amqp://localhost', (err, conn) => {
             esclient.search ({
                 index: "product",
                 body: { 
-                    query: { "match": { desc: `*${query}*` } } 
+                    query: { wildcard: { description: `*${query}*` } } 
                 }
             }).then((r) => {
-                ch.sendToQueue(msg.properties.replyTo, new Buffer(JSON.stringify(r.hits.hits)), {correlationId: msg.properties.correlationId});
+                let a = r.hits.hits.map ( (me) => {
+                    return me._source;
+                });
+                ch.sendToQueue(msg.properties.replyTo, new Buffer(JSON.stringify(a)), {correlationId: msg.properties.correlationId});
                 ch.ack(msg);
             }).catch ( err => {
+                console.log ( err );
                 ch.sendToQueue(msg.properties.replyTo, new Buffer("⟂"), {correlationId: msg.properties.correlationId});
                 ch.ack(msg);
             });

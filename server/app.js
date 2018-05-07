@@ -181,7 +181,7 @@ app.get ( "/item/:id", async ( req, res ) => {
                     }
                 }
             }, {noAck: true});
-
+            console.log ( itemid );
             ch.sendToQueue('get_item', new Buffer(itemid.toString()), { correlationId: corr, replyTo: q.queue });
         });
     });
@@ -440,6 +440,10 @@ app.post ( "/login", async ( req, res ) => {
 app.post ( "/logout", async ( req, res ) => {
     //Handle removing the session key from the store
 });
+
+app.use ( "*", (req, res ) => {
+    res.status(404).send();
+})
 
 // Start Listening for the server
 app.listen ( 5000, () => {
