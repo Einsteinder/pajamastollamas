@@ -6,7 +6,7 @@ import AppLayout from './AppLayout';
 
 class Products extends Component {
 componentDidMount(){
-    this.props.fetchProducts()
+    this.props.fetchproducts()
 }
   render() {
     return (
