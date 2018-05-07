@@ -337,9 +337,9 @@ app.post ( "/forum/rating/:id", async ( req, res ) => {
 
 // Make a new item
 app.post ( "/item/", async ( req, res ) => {
-    if (!req.cookies.sessionId || !(await sessionValid(req.cookies.sessionId))) {
+    /* if (!req.cookies.sessionId || !(await sessionValid(req.cookies.sessionId))) {
         res.status(400).send({ message: 'Session Expired'}) // handle error
-    }
+    } */
     let body = req.body;
     mqConn.createChannel(function(err, ch) {
         ch.assertQueue('', {exclusive: true}, function(err, q) {

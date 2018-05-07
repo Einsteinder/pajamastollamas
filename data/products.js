@@ -21,7 +21,7 @@ let exportedMethods = {
       });
     });
   },
-  addProduct(name, description, tags, imageSrc) {
+  addProduct(name, description, tags, price, imageSrc) {
     return products().then(productCollection => {
       return products.getUserById(productId).then( product => {
         let newProduct = {

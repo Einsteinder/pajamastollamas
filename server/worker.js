@@ -236,7 +236,7 @@ amqp.connect('amqp://localhost', (err, conn) => {
         ch.consume(q, async function reply(msg) {
             var n = JSON.parse(msg.content.toString());
             try {
-                var r = await items.addProduct ( n.name, n.description, n.tags, n.imageSrc );
+                var r = await items.addProduct ( n.name, n.description, n.tags, n.price, n.imageSrc );
                 esclient.index ({
                     index: 'product',
                     type: 'doc',
