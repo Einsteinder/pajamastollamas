@@ -7,7 +7,6 @@ import PostsContainer from '../containers/PostsContainer';
 import PostDetailContainer from '../containers/PostDetailContainer';
 import ProductsContainer from '../containers/ProductsContainer';
 import ProductDetailContainer from '../containers/ProductDetailContainer';
-import { ConnectedRouter, routerReducer, routerMiddleware, push } from 'react-router-redux'
 
 
 class App extends Component {

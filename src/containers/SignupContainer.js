@@ -1,5 +1,4 @@
 import { connect } from 'react-redux'
-import ElasticSearch from '../components/ElasticSearch';
 import WrappedSignupForm from '../components/Signup';
 import {postSignup } from '../actions'
 

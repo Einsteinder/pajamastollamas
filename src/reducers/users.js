@@ -14,9 +14,17 @@ export const users = (state = {}, action) => {
         currentUser:{}
     }
         case 'LOG_IN':
-            return {users:state.users,
-            currentUser:action.user
-        }
+            const currentUser = state.users.filter(user=>user.email===action.user.email)[0]
+            if(currentUser){
+                return {users:state.users,
+                    currentUser:{email:currentUser.email,admin:currentUser.admin}}
+            }else{
+                return {users:state.users,
+                    currentUser:{}
+                }
+            }
+
+        
         case 'LOG_OUT':
         return {users:state.users,
             currentUser:{}

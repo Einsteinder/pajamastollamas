@@ -3,6 +3,9 @@ export const products = (state = [], action) => {
     switch (action.type) {
       case 'RECEIVE_PRODUCTS':
         return action.products
+      case 'ADD_PRODUCT':
+        return [...state,action.product]
+
 
         
       default:

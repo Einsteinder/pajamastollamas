@@ -117,6 +117,30 @@ export function logout(){
 };
 }
 
+export function addProduct(product){
+  return {
+    type: 'ADD_PRODUCT',
+    product
+    
+};
+}
+
+export function postProduct(product){
+  return (dispatch)=>{
+
+    var promise1 = new Promise(function(resolve, reject) {
+      setTimeout(resolve, 2000, "post product successfully");
+    });
+    promise1.then((response)=>{
+
+      dispatch(addProduct(product));
+
+    })
+
+
+};
+}
+
 
 export function postLogin(user){
     

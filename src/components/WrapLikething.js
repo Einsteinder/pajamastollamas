@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
 import './App.css';
 import 'antd/dist/antd.css';
-import {Form,Input,Popover, Button, List, Icon  } from 'antd';
+import { List, Icon  } from 'antd';
 import { Link } from "react-router-dom";
-import AppLayout from './AppLayout';
 import { HashLink as LinkH } from 'react-router-hash-link';
 import {handlelike } from '../actions'
 
@@ -34,7 +33,7 @@ let item = this.props.item
  
       <List.Item
         key={item.title}
-        actions={[<IconText onClick={this.props.handlethislike} type="like-o" text={item.voteScore} />, <LinkH to={`/forum/${item.id}#bottom`}><IconText type="message" text={item.commentCount} /></LinkH>]}
+        actions={[<a onClick={this.handlethislike}><IconText  type="like-o" text={item.voteScore} /></a>, <LinkH to={`/forum/${item.id}#bottom`}><IconText type="message" text={item.commentCount} /></LinkH>]}
       >
         <List.Item.Meta
        
