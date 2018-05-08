@@ -7,6 +7,11 @@ import { Link } from "react-router-dom";
 import Login from './Login';
 import Signup from './Signup';
 import SearchContainer from '../containers/SearchContainer';
+import SignupContainer from '../containers/SignupContainer'
+import { connect } from 'react-redux'
+import { postLogout } from '../actions'
+
+
 
 const { Content, Footer } = Layout;
 
@@ -14,7 +19,6 @@ class AppLayout extends Component {
     state = {
         login_visible: false,
         signup_visible: false,
-        user:""
 
     }
     hidesignin = () => {
@@ -29,7 +33,7 @@ class AppLayout extends Component {
         this.setState({ signup_visible });
     }
     handlelogout=()=>{
-        this.setState({user:""})
+        this.props.logout()
     }
     render() {
         return (
@@ -58,7 +62,7 @@ class AppLayout extends Component {
 
                             </Nav>
                             
-                                {(this.state.user)?
+                                {(Object.keys(this.props.currentUser).length !== 0)?
                                     <Nav pullRight>
                                     <Popover
                                     content={    <Button onClick={this.handlelogout}>Logout</Button>
@@ -68,7 +72,9 @@ class AppLayout extends Component {
                                     <NavItem eventKey={1} >
                                     <Icon type="user" />
     </NavItem>
-                                </Popover></Nav>: 
+                                </Popover></Nav>
+                                   : 
+                         
                                 <Nav pullRight>
                                 <Popover
                                     content={<Login />}
@@ -82,7 +88,7 @@ class AppLayout extends Component {
     </NavItem>
                                 </Popover>
                                 <Popover
-                                    content={<Signup />}
+                                    content={<SignupContainer />}
                                     title="Title"
                                     trigger="click"
                                     visible={this.state.signup_visible}
@@ -94,7 +100,6 @@ class AppLayout extends Component {
                                 </Popover>
 
                             </Nav>
-
                                 
                                }
                               
@@ -114,4 +119,21 @@ class AppLayout extends Component {
     }
 }
 
-export default AppLayout;
+
+
+const mapStateToProps = (state) => (
+    {
+    currentUser: state.currentUser,
+  })
+  const mapDispatchToProps = (dispatch) => ({
+    logout:()=>dispatch(postLogout())
+
+  })
+
+
+
+
+  export default connect(
+    mapStateToProps,mapDispatchToProps
+  )(AppLayout)
+  

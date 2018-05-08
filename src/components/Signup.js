@@ -13,6 +13,7 @@ class Signup extends React.Component {
     e.preventDefault();
     this.props.form.validateFieldsAndScroll((err, values) => {
       if (!err) {
+        this.props.postSignup(values)
         console.log('Received values of form: ', values);
       }
     });

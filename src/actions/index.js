@@ -93,8 +93,83 @@ export function handlelike(id) {
 };
 }
 
+export function signup(user){
+  return {
+    type: 'SIGN_UP',
+    user
+};
+}
 
 
+export function login(user){
+  return {
+    type: 'LOG_IN',
+    user
+    
+};
+}
+
+
+export function logout(){
+  return {
+    type: 'LOG_OUT',
+    
+};
+}
+
+
+export function postLogin(user){
+    
+  return (dispatch)=>{
+
+    var promise1 = new Promise(function(resolve, reject) {
+      setTimeout(resolve, 2000, "post logout successfully");
+    });
+    promise1.then((response)=>{
+
+      dispatch(login(user));
+
+    })
+
+
+};
+}
+
+export function postLogout(){
+    
+    return (dispatch)=>{
+  
+      var promise1 = new Promise(function(resolve, reject) {
+        setTimeout(resolve, 2000, "post logout successfully");
+      });
+      promise1.then((response)=>{
+  
+        dispatch(logout());
+  
+      })
+  
+  
+  };
+  }
+
+
+export function postSignup(user){
+console.log("action",user)
+  
+  return (dispatch)=>{
+
+    var promise1 = new Promise(function(resolve, reject) {
+      setTimeout(resolve, 1000, "post comment successfully");
+    });
+    promise1.then((response)=>{
+
+      dispatch(signup(user));
+
+    })
+
+
+};
+}
 
 export function postPostComment(comment) {
 
