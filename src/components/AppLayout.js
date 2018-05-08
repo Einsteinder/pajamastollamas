@@ -123,7 +123,7 @@ class AppLayout extends Component {
 
 const mapStateToProps = (state) => (
     {
-    currentUser: state.currentUser,
+    currentUser: state.users.currentUser,
   })
   const mapDispatchToProps = (dispatch) => ({
     logout:()=>dispatch(postLogout())

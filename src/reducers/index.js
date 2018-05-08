@@ -4,7 +4,6 @@ import comments from './comments'
 import productComments from './productComments'
 import {products,itemsIsLoading} from './products'
 import { users } from './users';
-import { currentUser } from './currentUser';
 import { routerReducer } from 'react-router-redux'
 
 
@@ -14,16 +13,17 @@ comments:[],
 productComments:[],
 products:[],
 itemsIsLoading:false,
-users:[ {email:"www@www.www",
+users:{users:[ {email:"www@www.www",
   password:"www",
   confirm:"www",
   nickname:"www",
   admin:true
 }],
-currentUser:{}
+currentUser:{},
+
 }
 
-
+}
 
 
 export default function combineReducers(state = initialState, action) {
@@ -34,7 +34,6 @@ export default function combineReducers(state = initialState, action) {
     products:products(state.products,action),
     itemsIsLoading:itemsIsLoading(state.itemsIsLoading,action),
     users:users(state.users,action),
-    currentUser:currentUser(state.currentUser,action),
     router: routerReducer
 
   }
