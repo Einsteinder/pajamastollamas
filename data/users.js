@@ -30,15 +30,13 @@ let exportedMethods = {
 			});
 		});
 	},
-  addUser(userInfo) {
+  addUser(nickname, email, password) {
     return users().then(userCollection => {
       let newUser = {
-        nickName: userInfo.nickName,
+        nickname,
         _id: uuid.v4(),
-        userName: userInfo.userName,
-        password: userInfo.password, 
-        posts: [],
-        reviews:[]
+        email,
+        password
       };
 
       return userCollection
@@ -58,51 +56,6 @@ let exportedMethods = {
           throw `Could not delete user with id of ${id}`;
         }
       });
-    });
-  },
-  updateUser(id, updatedUser) {
-    return this.getUserById(id).then(currentUser => {
-      let updatedUser = {
-        nickName: updatedUser.nickName,
-        userName: updatedUser.userName
-      };
-      let updateCommand = {
-        $set: updatedUser
-      };
-
-      return userCollection.updateOne({ _id: id }, updateCommand).then(() => {
-        return this.getUserById(id);
-      });
-    });
-  },
-  
-  addPostToUser(userId, postId, postTitle) {
-    return this.getUserById(id).then(currentUser => {
-      return userCollection.updateOne(
-        { _id: id },
-        {
-          $addToSet: {
-            posts: {
-              id: postId,
-              title: postTitle
-            }
-          }
-        }
-      );
-    });
-  },
-  removePostFromUser(userId, postId) {
-    return this.getUserById(id).then(currentUser => {
-      return userCollection.updateOne(
-        { _id: id },
-        {
-          $pull: {
-            posts: {
-              id: postId
-            }
-          }
-        }
-      );
     });
   }
 };

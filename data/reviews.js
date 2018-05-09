@@ -1,6 +1,6 @@
 const mongoCollections = require("./config/mongoCollections");
 const reviews = mongoCollections.reviews;
-const users = mongoCollections.users;
+const users = require("./users");
 const uuid = require("node-uuid");
 
 let exportedMethods = {
@@ -22,16 +22,16 @@ let exportedMethods = {
       });
     });
   },
-  addReview(title, body, tags, ReviewerId) {
+  addReview(userId, productId, content, timestamp) {
     return reviews().then(reviewCollection => {
-      return users.getUserById(reviewerId).then(userThatReviewed => {
+      return users.getUserById(userId).then(userThatReviewed => {
         let newReview = {
           _id: uuid.v4(),
-          body: body,
           userId: userId,
-          name: `${userThatReviewed.nickname}`,
-          productId: productId,
-          timestamp: timestamp,
+          author: userThatReviewed.nickname,
+          productId,
+          content,
+          timestamp
         };
 
         return reviewCollection
@@ -53,33 +53,6 @@ let exportedMethods = {
         } else {
         }
       });
-    });
-  },
-  updateReview(id, updatedReview) {
-    return reviews().then(reviewCollection => {
-      let updatedReviewData = {};
-
-      if (updatedReview.body) {
-        updatedReviewData.body = updatedReview.body;
-      }
-
-      if (updatedReview.name){
-        updatedReviewData.name = updatedReview.name;
-      }
-
-      if (updatedReview.userId){
-        updatedReviewData.userId = updatedReview.userId;
-      }
-
-      let updateCommand = {
-        $set: updatedReviewData
-      };
-
-      return reviewCollection
-        .updateOne({ _id: id }, updateCommand)
-        .then(result => {
-          return this.getReviewById(id);
-        });
     });
   }
 };

@@ -8,11 +8,6 @@ let exportedMethods = {
       return productCollection.find({}).toArray();
     });
   },
-  getProductsByReviewId(reviewId) {
-    return products().then(productCollection => {
-      return productCollection.find({ reviewId: reviewId }).toArray();
-    });
-  },
   getProductById(id) {
     return products().then(productCollection => {
       return productCollection.findOne({ _id: id }).then(product => {
@@ -21,26 +16,23 @@ let exportedMethods = {
       });
     });
   },
-  addProduct(name, description, tags, price, imageSrc) {
+  addProduct(imgURL, name, price, description) {
     return products().then(productCollection => {
-      return products.getProductById(productId).then( product => {
-        let newProduct = {
-          _id: uuid.v4(),
-          name: name,
-          description: description,
-          imageSrc: imageSrc,
-          price:price,
-          reviews:[]
-        };
+      let newProduct = {
+        _id: uuid.v4(),
+        imgURL,
+        name,
+        description,
+        price
+      };
 
-        return productCollection
-        .insertOne(newProduct)
-        .then(newInsertInformation => {
-          return newInsertInformation.insertedId;
-        })
-        .then(newId => {
-          return this.getProductById(newId);
-        });
+      return productCollection
+      .insertOne(newProduct)
+      .then(newInsertInformation => {
+        return newInsertInformation.insertedId;
+      })
+      .then(newId => {
+        return this.getProductById(newId);
       });
     });
   },
@@ -53,55 +45,6 @@ let exportedMethods = {
         }
       });
     });
-  },
-  updateProduct(id, updatedProduct) {
-    return products().then(productCollection => {
-      let updatedProductData = {};
-
-      if (updatedProduct.tags) {
-        updatedProductData.tags = updatedProduct.tags;
-      }
-
-      if (updatedProduct.title) {
-        updatedProductData.title = updatedProduct.title;
-      }
-
-      if (updatedProduct.body) {
-        updatedProductData.body = updatedProduct.body;
-      }
-
-      let updateCommand = {
-        $set: updatedProductData
-      };
-
-      return productCollection
-        .updateOne({ _id: id }, updateCommand)
-        .then(result => {
-          return this.getProductById(id);
-        });
-    });
-  },
-  updateReviewId(oldReviewId, newReviewId) {
-    let findDocuments = {
-      reviewId: oldReviewId
-    };
-
-    let firstUpdate = {
-      $pull: oldReviewId
-    };
-
-    let secondUpdate = {
-      $addToSet: newReviewId
-    };
-
-    return productCollection
-      .updateMany(findDocuments, firstUpdate)
-      .then(result => {
-        return productCollection.updateMany(findDocuments, secondUpdate);
-      })
-      .then(secondUpdate => {
-        return this.getProductsByReviewId(newReviewId);
-      });
   }
 };
 

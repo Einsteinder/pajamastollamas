@@ -2,37 +2,11 @@ const express = require ( "express" );
 const bodyParser = require ( "body-parser" );
 const cookieParser = require ( "cookie-parser" );
 const db = require("../data");
-/*const session = require("express-session");*/
 const redis = require("redis");
 const bluebird = require ( "bluebird" ); //For promisfy-ing the redis client
 bluebird.promisifyAll(redis.RedisClient.prototype);
 const client = redis.createClient();
-/*const passport = require("passport");
-const LocalStrategy = require("passport-local").Strategy;
 
-passport.use(new LocalStrategy(
-    function(username, password, done) {
-            db.getUserByUsername(username).then((user) => {
-                if (!user) return done(null, false, {message: "user not found"});
-                bcrypt.compare(password, user.hashedPassword, (err, res) => {
-                    if (err) return done(err);
-                    if (!res) return done(null, false, {message: "password does not match"});
-                    return done(null, user);
-                });
-            });
-    }
-));
-
-passport.serializeUser(function(user, done) {
-    done(null, user._id);
-});
-
-passport.deserializeUser(function(id, done) {
-    db.getUserByID(id).then((user) => {
-        done(null, user);
-    });
-});
- */
 let app = express();
 app.use ( cookieParser() );
 app.use ( bodyParser.json() );
@@ -46,23 +20,6 @@ async function sessionValid ( sessionkey ) {
     }
 }
 
-//app.use(passport.initialize());
-//var redisStore = require('connect-redis')(express);
-//var rClient = redis.createClient();
-
-/* app.use(session({
-        id:uuid.v4(),
-        secret:'secret',
-        store: new redisStore({
-            host:'localhost',
-            port:3000,
-            client:rClient,
-            ttl: 7200
-        }),
-        saveUninitialized:false,
-        resave:false
-})); */
-
 const amqp = require ( "amqplib/callback_api" );
 let mqConn = undefined;
 
@@ -75,7 +32,6 @@ function generateUuid() {
 }
 
 /* Routes */
-
 // GETS
 
 // Gets a forum post ":id"

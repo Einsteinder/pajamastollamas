@@ -14,14 +14,6 @@ let exportedMethods = {
       return postCollection.find({ title: title }).toArray();
     });
   },
-  getPostCommentsByPostId(id) {
-    return post().then(postCollection => {
-      return postCollection.find({ _id: id }).then(post => {
-        if (!post.Comments) return null;
-        return post.Comments;
-      });
-    });
-  },
   getPostById(id) {
     return posts().then(postCollection => {
       return postCollection.findOne({ _id: id }).then(post => {
@@ -30,18 +22,18 @@ let exportedMethods = {
       });
     });
   },
-  addPost(title, body, tags, posterId, timestamp, upVotes) {
+  addPost(userId, timestamp, title, content) {
     return posts().then(postCollection => {
-      return users.getUserById(posterId).then(userThatPosted => {
+      return users.getUserById(userId).then(userThatPosted => {
         let newPost = {
           _id: uuid.v4(),
-          title:title,
-          posterId: posterId,
-          name: `${userThatPosted.nickName}`,
-          timestamp: timestamp,
-          body: body,
-          upVotes: upVotes,
-          postComments:[]
+          userId,
+          author: userThatPosted.nickname,
+          title,
+          content,
+          voteScore: 0,
+          deleted: false,
+          commentCount: 0
         };
 
         return postCollection
@@ -55,14 +47,21 @@ let exportedMethods = {
       });
     });
   },
-  incrementUpVotes(id){
-    var post = this.getPostById(id);
-    var updatedUpVotes = post.upVotes;
-    $inc: {upVotes:1};
-    var newPost = {
-      upVotes:updatedUpVotes,
-    }
-    this.updatePost(id,newPost)
+  changeVoteScore(id, am){
+    return posts().then(postCollection => {
+        return postCollection.updateOne({ _id: id }, { $inc: {voteScore: am} })
+        .then(result => {
+          return this.getPostById(id);
+        });
+    });
+  },
+  addComment(id) {
+    return posts().then(postCollection => {
+      return postCollection.updateOne({ _id: id }, { $inc: { commentCount: 1} })
+      .then ( res => {
+        return this.getPostById(id);
+      });
+    });
   },
   removePost(id) {
     return posts().then(postCollection => {
@@ -74,45 +73,6 @@ let exportedMethods = {
       });
     });
   },
-  updatePost(id, updatedPost) {
-    return posts().then(postCollection => {
-      let updatedPostData = {};
-
-      if (updatedPost.timestamp) {
-        updatedPostData.timestamp = updatedPost.timestamp;
-      }
-
-      if (updatedPost.posterId) {
-        updatedPostData.posterId = updatedPost.posterId;
-      }
-
-      if (updatedPost.title) {
-        updatedPostData.title = updatedPost.title;
-      }
-
-      if (updatedPost.body) {
-        updatedPostData.body = updatedPost.body;
-      }
-
-      if (updatedPost.upVotes) {
-        updatedPostData.upVotes = updatedPost.upVotes;
-      }
-
-      if (updatedPost.downVotes) {
-        updatedPostData.downVotes = updatedPost.downVotes;
-      }
-
-      let updateCommand = {
-        $set: updatedPostData
-      };
-
-      return postCollection
-        .updateOne({ _id: id }, updateCommand)
-        .then(result => {
-          return this.getPostById(id);
-        });
-    });
-  }
 };
 
 module.exports = exportedMethods;
