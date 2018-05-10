@@ -18,11 +18,10 @@ let exportedMethods = {
       });
     });
   },
-  getUserByUsername(username) {
+  getUserByEmail(email) {
 		return users().then((userCollection)=> {
-			return userCollection.findOne({username: username}).then((user)=> {
+			return userCollection.findOne({email: email}).then((user)=> {
 				if (user) {
-					user.isadmin = false;
 					return user;
 				} else {
           throw "User not found";
@@ -41,11 +40,8 @@ let exportedMethods = {
 
       return userCollection
         .insertOne(newUser)
-        .then(newInsertInformation => {
-          return newInsertInformation.insertedId;
-        })
-        .then(newId => {
-          return this.getUserById(newId);
+        .then(info => {
+          return this.getUserById(newUser._id);
         });
     });
   },
@@ -56,6 +52,13 @@ let exportedMethods = {
           throw `Could not delete user with id of ${id}`;
         }
       });
+    });
+  },
+  updateUser(id, body) {
+    return users().then(userCollection => {
+      return userCollection.updateOne ( {_id: id}, body ).then(info => {
+        return this.getUserById ( id );
+      })
     });
   }
 };

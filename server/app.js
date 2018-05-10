@@ -4,6 +4,7 @@ const cookieParser = require ( "cookie-parser" );
 const db = require("../data");
 const redis = require("redis");
 const bluebird = require ( "bluebird" ); //For promisfy-ing the redis client
+const bcrypt = require ( "bcrypt" );
 bluebird.promisifyAll(redis.RedisClient.prototype);
 const client = redis.createClient();
 
@@ -211,9 +212,9 @@ app.get ( "/items/search/:query", ( req, res ) => {
 
 // Make a new forum post
 app.post ( "/forum/", async ( req, res ) => {
-    /*if (!req.cookies.sessionId || !(await sessionValid(req.cookies.sessionId))) {
+    if (!req.cookies.sessionId || (0 == await sessionValid(req.cookies.sessionId))) {
         res.status(400).send({ message: 'Session Expired'}) // handle error
-    }*/
+    }
     let body = req.body;
     mqConn.createChannel(function(err, ch) {
         ch.assertQueue('', {exclusive: true}, function(err, q) {
@@ -231,7 +232,7 @@ app.post ( "/forum/", async ( req, res ) => {
 
 // Make a new comment on forum post :id
 app.post ( "/forum/comments/:id", async ( req, res ) => {
-    if (!req.cookies.sessionId || !(await sessionValid(req.cookies.sessionId))) {
+    if (!req.cookies.sessionId || (0 == await sessionValid(req.cookies.sessionId))) {
         res.status(400).send({ message: 'Session Expired'}) // handle error
     }
     let id = req.params.id;
@@ -251,7 +252,7 @@ app.post ( "/forum/comments/:id", async ( req, res ) => {
 });
 
 app.post ( "/forum/comments/rating/:id", async (req, res) => {
-    if ( !req.cookies.sessionId || !(await sessionValid(req.cookies.sessionId)) ) {
+    if ( !req.cookies.sessionId || (0 == await sessionValid(req.cookies.sessionId)) ) {
         res.status ( 400 ).send ({message: "Session Expired"});
     }
     let id = req.params.id;
@@ -272,7 +273,7 @@ app.post ( "/forum/comments/rating/:id", async (req, res) => {
 
 // Make a rate on forum post :id (body should be +/- 1)
 app.post ( "/forum/rating/:id", async ( req, res ) => {
-    if (!req.cookies.sessionId || !(await sessionValid(req.cookies.sessionId))) {
+    if (!req.cookies.sessionId || (0 == await sessionValid(req.cookies.sessionId))) {
         res.status(400).send({ message: 'Session Expired'}) // handle error
     }
     let id = req.params.id;
@@ -293,9 +294,9 @@ app.post ( "/forum/rating/:id", async ( req, res ) => {
 
 // Make a new item
 app.post ( "/item/", async ( req, res ) => {
-    /* if (!req.cookies.sessionId || !(await sessionValid(req.cookies.sessionId))) {
+    if (!req.cookies.sessionId || (0 == await sessionValid(req.cookies.sessionId))) {
         res.status(400).send({ message: 'Session Expired'}) // handle error
-    } */
+    }
     let body = req.body;
     mqConn.createChannel(function(err, ch) {
         ch.assertQueue('', {exclusive: true}, function(err, q) {
@@ -313,7 +314,7 @@ app.post ( "/item/", async ( req, res ) => {
 
 // Make a new comment on item :id
 app.post ( "/item/comments/:id", async ( req, res ) => {
-    if (!req.cookies.sessionId || !(await sessionValid(req.cookies.sessionId))) {
+    if (!req.cookies.sessionId || (0 == await sessionValid(req.cookies.sessionId))) {
         res.status(400).send({ message: 'Session Expired'}) // handle error
     }
     let id = req.params.id;
@@ -334,7 +335,7 @@ app.post ( "/item/comments/:id", async ( req, res ) => {
 
 // Make a new user
 app.post ( "/user/", async ( req, res ) => {
-    if (!req.cookies.sessionId || !(await sessionValid(req.cookies.sessionId))) {
+    if (!req.cookies.sessionId || (0 == await sessionValid(req.cookies.sessionId))) {
         res.status(400).send({ message: 'Session Expired'}) // handle error
     }
     let body = req.body;
@@ -354,8 +355,9 @@ app.post ( "/user/", async ( req, res ) => {
 
 // Make a new admin for user :id
 app.post ( "/admin/:id", async ( req, res ) => {
-    if (!req.cookies.sessionId || !(await sessionValid(req.cookies.sessionId))) {
+    if (!req.cookies.sessionId || !(2 == await sessionValid(req.cookies.sessionId))) {
         res.status(400).send({ message: 'Session Expired'}) // handle error
+        return;
     }
     let id = req.params.id;
     mqConn.createChannel(function(err, ch) {
@@ -378,15 +380,26 @@ app.post ( "/login", async ( req, res ) => {
     let username = body.username;
     let hPass = body.password;
     if ( req.cookies.sessionId ) {
-        res.clearCookie("sessionId");
+        if ( 0 == await sessionValid ( req.cookies.sessionId ) ) {
+            res.clearCookie("sessionId");
+        } else {
+            await client.expireAsync(req.cookies.sessionId, 60*60);
+            res.sendStatus(200);
+            return;
+        }
     }
-    let user = await db.users.getUserByUsername(username)
-    if ( bcrypt.compareSync(hPass,user.enpassword) ) {
+    let user = undefined;
+    try {
+        user = await db.users.getUserByEmail(username)
+    } catch ( e ) {
+        res.status(404).send ( {message: "User not found"} );
+    }
+    if ( /* bcrypt.compareSync(hPass,user.password) */ user.password == hPass ) {
         let id = generateUuid();
         let i = (user.admin || 1);
-        await redis.setAsync ( id, i, "EX", 60 * 60 );
-        res.cookie( "sessionId",id,{ expires: d } );
-        res.status(200).send(i);
+        await client.setAsync ( id, i, "EX", 60 * 60 );
+        res.cookie( "sessionId", id, i );
+        res.sendStatus(200);
     } else {
         res.status(400).send ( {message: "Error - Login Invalid"} );
     }
@@ -394,7 +407,11 @@ app.post ( "/login", async ( req, res ) => {
 });
 
 app.post ( "/logout", async ( req, res ) => {
-    //Handle removing the session key from the store
+    res.clearCookie("sessionId");
+    if ( req.cookies.sessionId ) {
+        await client.delAsync ( req.cookies.sessionId );
+    }
+    res.sendStatus(200);
 });
 
 app.use ( "*", (req, res ) => {

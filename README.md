@@ -15,7 +15,7 @@ You need an up-to-date version of Elastic Search (6.2)
 You need (of course) mongodb   
 You need the redis server   
 You need the rabbitmq-server   
-We have provided a shell script "RequiredServers.sh", which can be run using "npm run installServers". It will install brew and use brew to download everything, so if you want to do it manually you are of course free to do so   
+We have provided a shell script "RequiredServers.sh", which can be run using "npm run installServers". It will install brew and use brew to download everything, so if you want to do it manually you are of course free to do so. It hasn't been tested very well, so use at your own risk.   
 
 ## Usage
 You need to make sure that redis, mongo, the rabbitmq-server, and the elastic search service are all runing before starting   

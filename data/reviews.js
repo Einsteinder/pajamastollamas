@@ -11,7 +11,12 @@ let exportedMethods = {
   },
   getReviewsByUserId(id) {
     return reviews().then(reviewCollection => {
-      return reviewCollection.find({ userId: userId }).toArray();
+      return reviewCollection.find({ userId: id }).toArray();
+    });
+  },
+  getReviewsByProductId(id) {
+    return reviews().then(reviewCollection => {
+      return reviewCollection.find({ productId: id }).toArray();
     });
   },
   getReviewById(id) {

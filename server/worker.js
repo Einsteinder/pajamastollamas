@@ -48,7 +48,7 @@ amqp.connect('amqp://localhost', (err, conn) => {
         ch.consume(q, async function reply(msg) {
             var id = parseInt(msg.content.toString());
             try {
-                var r = await fcomments.getPostCommentsById ( id );
+                var r = await fcomments.getPostCommentsByParentId ( id );
             } catch ( err ) {
                 console.log ( err );
                 ch.sendToQueue(msg.properties.replyTo, new Buffer("⟂"), {correlationId: msg.properties.correlationId});
@@ -69,7 +69,7 @@ amqp.connect('amqp://localhost', (err, conn) => {
         ch.consume(q, async function reply(msg) {
             var id = parseInt(msg.content.toString());
             try {
-                var r = icomments.getReviewById ( id );
+                var r = await icomments.getReviewsByProductId ( id );
             } catch ( err ) {
                 console.log ( err );
                 ch.sendToQueue(msg.properties.replyTo, new Buffer("⟂"), {correlationId: msg.properties.correlationId});
@@ -174,7 +174,7 @@ amqp.connect('amqp://localhost', (err, conn) => {
         ch.consume(q, async function reply(msg) {
             var n = JSON.parse(msg.content.toString());
             try {
-                var r = await fposts.addPost ( n.title, n.body, undefined, n.posterId );
+                var r = await fposts.addPost ( n.userId, n.timestamp, n.title, n.content );
             } catch ( err ) {
                 console.log ( err );
                 ch.sendToQueue(msg.properties.replyTo, new Buffer("⟂"), {correlationId: msg.properties.correlationId});
@@ -193,9 +193,30 @@ amqp.connect('amqp://localhost', (err, conn) => {
         ch.prefetch(1);
         console.log(' [x] Post Forum Comment - Waiting');
         ch.consume(q, async function reply(msg) {
-            var n = msg.content.toString();
+            var n = JSON.parse(msg.content.toString());
             try {
-                var r = [];
+                var r = await fcomments.addPostComment ( n.id, n.body.timestamp, n.body.content, n.body.userId );
+            } catch ( err ) {
+                console.log ( err );
+                ch.sendToQueue(msg.properties.replyTo, new Buffer("⟂"), {correlationId: msg.properties.correlationId});
+                ch.ack(msg);
+                return;
+            }
+            ch.sendToQueue(msg.properties.replyTo, new Buffer(JSON.stringify(r)), {correlationId: msg.properties.correlationId});
+            ch.ack(msg);
+        });
+    });
+    // Rates a forum comment
+    conn.createChannel(function(err, ch) {
+        var q = 'post_forum_comment_rating';
+    
+        ch.assertQueue(q, {durable: false});
+        ch.prefetch(1);
+        console.log(' [x] Post Forum Comment Rating - Waiting');
+        ch.consume(q, async function reply(msg) {
+            var n = JSON.parse(msg.content.toString());
+            try {
+                var r = await fcomments.changeVoteScore ( n.id, n.am );
             } catch ( err ) {
                 console.log ( err );
                 ch.sendToQueue(msg.properties.replyTo, new Buffer("⟂"), {correlationId: msg.properties.correlationId});
@@ -214,9 +235,9 @@ amqp.connect('amqp://localhost', (err, conn) => {
         ch.prefetch(1);
         console.log(' [x] Post Forum Rating - Waiting');
         ch.consume(q, async function reply(msg) {
-            var n = msg.content.toString();
+            var n = JSON.parse(msg.content.toString());
             try {
-                var r = {};
+                var r = await fposts.changeVoteScore ( n.id, n.am );
             } catch ( err ) {
                 console.log ( err );
                 ch.sendToQueue(msg.properties.replyTo, new Buffer("⟂"), {correlationId: msg.properties.correlationId});
@@ -237,7 +258,7 @@ amqp.connect('amqp://localhost', (err, conn) => {
         ch.consume(q, async function reply(msg) {
             var n = JSON.parse(msg.content.toString());
             try {
-                var r = await items.addProduct ( n.name, n.description, n.tags, n.price, n.imageSrc );
+                var r = await items.addProduct ( n.imgURL, n.name, n.price, n.description );
                 esclient.index ({
                     index: 'product',
                     type: 'doc',
@@ -264,7 +285,14 @@ amqp.connect('amqp://localhost', (err, conn) => {
         console.log(' [x] Post Item Comment - Waiting');
         ch.consume(q, async function reply(msg) {
             var n = JSON.parse(msg.content.toString());
-            var r = await icomments.addReview(n.title, n.body, [], n.posterId );
+            try {
+                var r = await icomments.addReview ( n.body.userId, n.id, n.body.content, n.body.timestamp );
+            } catch ( err ) {
+                console.log ( err );
+                ch.sendToQueue(msg.properties.replyTo, new Buffer("⟂"), {correlationId: msg.properties.correlationId});
+                ch.ack(msg);
+                return;
+            }
             ch.sendToQueue(msg.properties.replyTo, new Buffer(JSON.stringify(r)), {correlationId: msg.properties.correlationId});
             ch.ack(msg);
         });
@@ -278,12 +306,14 @@ amqp.connect('amqp://localhost', (err, conn) => {
         console.log(' [x] Post User - Waiting');
         ch.consume(q, async function reply(msg) {
             var n = JSON.parse(msg.content.toString());
-            var userInfo = {
-                userName: n.email,
-                password: n.password,
-                nickName: n.nickname
+            try {
+                var r = await users.addUser ( n.nickname, n.email, n.password );
+            } catch ( err ) {
+                console.log ( err );
+                ch.sendToQueue(msg.properties.replyTo, new Buffer("⟂"), {correlationId: msg.properties.correlationId});
+                ch.ack(msg);
+                return;
             }
-            var r = await users.addUser(userInfo);//await data.users.create
 
             ch.sendToQueue(msg.properties.replyTo, new Buffer(JSON.stringify(r)), {correlationId: msg.properties.correlationId});
             ch.ack(msg);
