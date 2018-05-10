@@ -1,4 +1,3 @@
-
 const productComments = (state = [], action) => {
     switch (action.type) {
       case 'RECEIVE_PRODUCT_COMMENTS':
@@ -6,7 +5,6 @@ const productComments = (state = [], action) => {
 
       case 'ADD_PRODUCT_COMMENT':
 
-  
         return [
           ...state,
           

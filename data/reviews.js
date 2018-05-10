@@ -59,6 +59,11 @@ let exportedMethods = {
         }
       });
     });
+  },
+  async empty () {
+    const commentCollection = await reviews();
+    const data = await commentCollection.remove({});
+    return data;
   }
 };
 

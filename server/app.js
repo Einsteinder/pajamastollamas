@@ -11,7 +11,9 @@ const client = redis.createClient();
 let app = express();
 app.use ( cookieParser() );
 app.use ( bodyParser.json() );
-app.use(express.static('static'))
+app.use ( '/img', express.static(__dirname + '/images' ) );
+
+
 
 async function sessionValid ( sessionkey ) {
     if ( 1 == await client.existsAsync ( sessionkey) ) {
@@ -32,30 +34,15 @@ function generateUuid() {
     return Math.random().toString() + Math.random().toString() + Math.random().toString();
 }
 
+app.use ( function ( req, res, next ) {
+    res.header("Access-Control-Allow-Origin", "*");
+    next();
+});
+
 /* Routes */
 // GETS
 
-// Gets a forum post ":id"
-app.get ( "/forum/:id", ( req, res ) => {
-    let id = req.params.id;
-    mqConn.createChannel(function(err, ch) {
-        ch.assertQueue('', {exclusive: true}, function(err, q) {
-            var corr = generateUuid();
-            ch.consume(q.queue, function(msg) {
-                if (msg.properties.correlationId === corr) {
-                    msg = msg.content.toString();
-                    if ( msg == "⟂") {
-                        res.status(404).send({message: "Error"});
-                    } else {
-                        res.status(200).send(msg);
-                    }
-                }
-            }, {noAck: true});
 
-            ch.sendToQueue('get_forum_post', new Buffer(id.toString()), { correlationId: corr, replyTo: q.queue });
-        });
-    });
-});
 
 // Gets all forum posts
 app.get ( "/forum/", ( req, res ) => {
@@ -74,6 +61,48 @@ app.get ( "/forum/", ( req, res ) => {
             }, {noAck: true});
 
             ch.sendToQueue('get_all_forum_posts', new Buffer(""), { correlationId: corr, replyTo: q.queue });
+        });
+    });
+});
+
+// Gets all forum post comments
+app.get ( "/forum/comments/", ( req, res ) => {
+    mqConn.createChannel(function(err, ch) {
+        ch.assertQueue('', {exclusive: true}, function(err, q) {
+            var corr = generateUuid();
+            ch.consume(q.queue, function(msg) {
+                if (msg.properties.correlationId === corr) {
+                    msg = msg.content.toString();
+                    if ( msg == "⟂") {
+                        res.status(404).send({message: "Error"});
+                    } else {
+                        res.status(200).send(msg);
+                    }
+                }
+            }, {noAck: true});
+
+            ch.sendToQueue('get_all_forum_post_comments', new Buffer(""), { correlationId: corr, replyTo: q.queue });
+        });
+    });
+});
+
+// Gets all item comments
+app.get ( "/item/comments/", ( req, res ) => {
+    mqConn.createChannel(function(err, ch) {
+        ch.assertQueue('', {exclusive: true}, function(err, q) {
+            var corr = generateUuid();
+            ch.consume(q.queue, function(msg) {
+                if (msg.properties.correlationId === corr) {
+                    msg = msg.content.toString();
+                    if ( msg == "⟂") {
+                        res.status(404).send({message: "Error"});
+                    } else {
+                        res.status(200).send(msg);
+                    }
+                }
+            }, {noAck: true});
+
+            ch.sendToQueue('get_all_item_comments', new Buffer(""), { correlationId: corr, replyTo: q.queue });
         });
     });
 });
@@ -118,6 +147,28 @@ app.get ( "/item/comments/:id", async ( req, res ) => {
             }, {noAck: true});
 
             ch.sendToQueue('get_item_comments', new Buffer(itemid.toString()), { correlationId: corr, replyTo: q.queue });
+        });
+    });
+});
+
+// Gets the items matching the search term :query
+app.get ( "/items/search/:query", ( req, res ) => {
+    let query = req.params.query;
+    mqConn.createChannel(function (err, ch) {
+        ch.assertQueue('', {exclusive: true}, function(err, q) {
+            var corr = generateUuid();
+            ch.consume(q.queue, function(msg) {
+                if (msg.properties.correlationId === corr) {
+                    msg = msg.content.toString();
+                    if ( msg == "⟂") {
+                        res.status(404).send({message: "Error"});
+                    } else {
+                        res.status(200).send(msg);
+                    }
+                }
+            }, {noAck: true});
+
+            ch.sendToQueue('search_items', new Buffer(query.toString()), { correlationId: corr, replyTo: q.queue });
         });
     });
 });
@@ -186,10 +237,10 @@ app.get ( "/user/:id", async ( req, res ) => {
     });
 });
 
-// Gets the items matching the search term :query
-app.get ( "/items/search/:query", ( req, res ) => {
-    let query = req.params.query;
-    mqConn.createChannel(function (err, ch) {
+// Gets a forum post ":id"
+app.get ( "/forum/:id", ( req, res ) => {
+    let id = req.params.id;
+    mqConn.createChannel(function(err, ch) {
         ch.assertQueue('', {exclusive: true}, function(err, q) {
             var corr = generateUuid();
             ch.consume(q.queue, function(msg) {
@@ -203,7 +254,7 @@ app.get ( "/items/search/:query", ( req, res ) => {
                 }
             }, {noAck: true});
 
-            ch.sendToQueue('search_items', new Buffer(query.toString()), { correlationId: corr, replyTo: q.queue });
+            ch.sendToQueue('get_forum_post', new Buffer(id.toString()), { correlationId: corr, replyTo: q.queue });
         });
     });
 });
@@ -314,17 +365,20 @@ app.post ( "/item/", async ( req, res ) => {
 
 // Make a new comment on item :id
 app.post ( "/item/comments/:id", async ( req, res ) => {
-    if (!req.cookies.sessionId || (0 == await sessionValid(req.cookies.sessionId))) {
+    /* if (!req.cookies.sessionId || (0 == await sessionValid(req.cookies.sessionId))) {
         res.status(400).send({ message: 'Session Expired'}) // handle error
-    }
+        return;
+    } */
     let id = req.params.id;
     let body = req.body;
+    console.log ( {id, body} );
     mqConn.createChannel(function(err, ch) {
         ch.assertQueue('', {exclusive: true}, function(err, q) {
             var corr = generateUuid();
             ch.consume(q.queue, function(msg) {
                 if (msg.properties.correlationId === corr) {
                     res.status(200).send(msg.content);
+                    return;
                 }
             }, {noAck: true});
 
@@ -376,9 +430,11 @@ app.post ( "/admin/:id", async ( req, res ) => {
 
 // Logins the user with the given information. Creates a session key and returns it
 app.post ( "/login", async ( req, res ) => {
+    console.log ( "login" );
     let body = req.body;
     let username = body.username;
     let hPass = body.password;
+    console.log ( body );
     if ( req.cookies.sessionId ) {
         if ( 0 == await sessionValid ( req.cookies.sessionId ) ) {
             res.clearCookie("sessionId");
@@ -393,8 +449,9 @@ app.post ( "/login", async ( req, res ) => {
         user = await db.users.getUserByEmail(username)
     } catch ( e ) {
         res.status(404).send ( {message: "User not found"} );
+        return;
     }
-    if ( /* bcrypt.compareSync(hPass,user.password) */ user.password == hPass ) {
+    if ( bcrypt.compareSync(hPass,user.password) ) {
         let id = generateUuid();
         let i = (user.admin || 1);
         await client.setAsync ( id, i, "EX", 60 * 60 );

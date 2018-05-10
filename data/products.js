@@ -45,6 +45,11 @@ let exportedMethods = {
         }
       });
     });
+  },
+  async empty () {
+    const commentCollection = await products();
+    const data = await commentCollection.remove({});
+    return data;
   }
 };
 

@@ -73,6 +73,11 @@ let exportedMethods = {
       });
     });
   },
+  async empty () {
+    const commentCollection = await posts();
+    const data = await commentCollection.remove({});
+    return data;
+  }
 };
 
 module.exports = exportedMethods;

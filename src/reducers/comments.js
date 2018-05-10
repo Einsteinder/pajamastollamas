@@ -1,4 +1,6 @@
 
+
+
 const comments = (state = [], action) => {
     switch (action.type) {
       case 'RECEIVE_POST_COMMENTS':
@@ -6,6 +8,7 @@ const comments = (state = [], action) => {
 
       case 'ADD_POST_COMMENT':
 
+        console.log ( action.comment );
   
         return [
           ...state,

@@ -23,4 +23,4 @@ You will need to run the front end client, using react, via npm start
 You will need to seed the database using npm run seed   
 You will need to start the server and worker using npm run server   
 From this, you can navigate the front end client, and may interact with the database   
-Your credentials for using the service are the username "Professor" and the password "greatpassword"   
+Your credentials for using the service are the username "prof@test.com" and the password "greatpassword"   

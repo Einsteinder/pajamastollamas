@@ -13,7 +13,11 @@ let exportedMethods = {
           });
         });
       },
-  
+  getAllPostComments() {
+    return postComments().then(coll => {
+      return coll.find({}).toArray();
+    })
+  },
   addPostComment(parentId, timestamp, content, userId) {
     return postComments().then(postCollection => {
       return users.getUserById(userId).then(userThatPosted => {
@@ -24,7 +28,7 @@ let exportedMethods = {
             timestamp: timestamp,
             content: content,
             userId: userId,
-            author: `${userThatPosted.nickName}`,
+            author: userThatPosted.nickname,
             voteScore: 0,
             deleted: false,
             parentDeleted: false
@@ -65,6 +69,11 @@ let exportedMethods = {
     return postComments().then(postCommentsCollection => {
       return postCommentsCollection.find({ parentId: id }).toArray();
     });
+  },
+  async empty () {
+    const commentCollection = await postComments();
+    const data = await commentCollection.remove({});
+    return data;
   }
 };
 

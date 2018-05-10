@@ -143,6 +143,48 @@ amqp.connect('amqp://localhost', (err, conn) => {
             ch.ack(msg);
         });
     });
+    // gets all forum posts' comments
+    conn.createChannel(function(err, ch) {
+        var q = 'get_all_forum_post_comments';
+    
+        ch.assertQueue(q, {durable: false});
+        ch.prefetch(1);
+        console.log(' [x] Get All Forum Post Comments - Waiting');
+        ch.consume(q, async function reply(msg) {
+            var id = parseInt(msg.content.toString());
+            try {
+                var r = await fcomments.getAllPostComments();
+            } catch ( err ) {
+                console.log ( err );
+                ch.sendToQueue(msg.properties.replyTo, new Buffer("⟂"), {correlationId: msg.properties.correlationId});
+                ch.ack(msg);
+                return;
+            }
+            ch.sendToQueue(msg.properties.replyTo, new Buffer(JSON.stringify(r)), {correlationId: msg.properties.correlationId});
+            ch.ack(msg);
+        });
+    });
+    // gets all forum posts' comments
+    conn.createChannel(function(err, ch) {
+        var q = 'get_all_item_comments';
+    
+        ch.assertQueue(q, {durable: false});
+        ch.prefetch(1);
+        console.log(' [x] Get All Item Comments - Waiting');
+        ch.consume(q, async function reply(msg) {
+            var id = parseInt(msg.content.toString());
+            try {
+                var r = await icomments.getAllReviews();
+            } catch ( err ) {
+                console.log ( err );
+                ch.sendToQueue(msg.properties.replyTo, new Buffer("⟂"), {correlationId: msg.properties.correlationId});
+                ch.ack(msg);
+                return;
+            }
+            ch.sendToQueue(msg.properties.replyTo, new Buffer(JSON.stringify(r)), {correlationId: msg.properties.correlationId});
+            ch.ack(msg);
+        });
+    });
     // gets a user info
     conn.createChannel(function(err, ch) {
         var q = 'get_user';
