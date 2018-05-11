@@ -13,12 +13,7 @@ comments:[],
 productComments:[],
 products:[],
 itemsIsLoading:false,
-users:{users:[ {email:"www@www.www",
-  password:"www",
-  confirm:"www",
-  nickname:"www",
-  admin:true
-}],
+users:{users:[],
 currentUser:{},
 
 }

@@ -17,9 +17,19 @@ app.use ( '/img', express.static(__dirname + '/images' ) );
 
 async function sessionValid ( sessionkey ) {
     if ( 1 == await client.existsAsync ( sessionkey) ) {
-        return await client.getAsync ( sessionkey )
+        let u = JSON.parse(await client.getAsync ( sessionkey ) );
+        return (u.admin || 1);
     } else {
         return 0;
+    }
+}
+
+async function getCurrentUser ( sessionkey ) {
+    if ( 1 == await client.existsAsync ( sessionkey ) ) {
+        let u = JSON.parse(await client.getAsync ( sessionkey ) );
+        return u;
+    } else {
+        return undefined;
     }
 }
 
@@ -35,8 +45,16 @@ function generateUuid() {
 }
 
 app.use ( function ( req, res, next ) {
-    res.header("Access-Control-Allow-Origin", "*");
-    next();
+    //console.log ( req.headers );
+    res.header("Access-Control-Allow-Origin", "http://localhost:3000");
+    res.header("Access-Control-Allow-Headers", "Content-Type");
+    res.header("Access-Control-Allow-Credentials", "true");
+    //res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, content-type, Accept");
+    if ( req.method === "OPTIONS" ) {
+        res.sendStatus ( 200 );
+    } else {
+        next();
+    }
 });
 
 /* Routes */
@@ -265,8 +283,11 @@ app.get ( "/forum/:id", ( req, res ) => {
 app.post ( "/forum/", async ( req, res ) => {
     if (!req.cookies.sessionId || (0 == await sessionValid(req.cookies.sessionId))) {
         res.status(400).send({ message: 'Session Expired'}) // handle error
+        return;
     }
+    let u = await getCurrentUser ( req.cookies.sessionId );
     let body = req.body;
+    body.userId = u._id;
     mqConn.createChannel(function(err, ch) {
         ch.assertQueue('', {exclusive: true}, function(err, q) {
             var corr = generateUuid();
@@ -285,9 +306,12 @@ app.post ( "/forum/", async ( req, res ) => {
 app.post ( "/forum/comments/:id", async ( req, res ) => {
     if (!req.cookies.sessionId || (0 == await sessionValid(req.cookies.sessionId))) {
         res.status(400).send({ message: 'Session Expired'}) // handle error
+        return;
     }
+    let u = await getCurrentUser ( req.cookies.sessionId );
     let id = req.params.id;
     let body = req.body;
+    body.userId = u._id;
     mqConn.createChannel(function(err, ch) {
         ch.assertQueue('', {exclusive: true}, function(err, q) {
             var corr = generateUuid();
@@ -305,9 +329,11 @@ app.post ( "/forum/comments/:id", async ( req, res ) => {
 app.post ( "/forum/comments/rating/:id", async (req, res) => {
     if ( !req.cookies.sessionId || (0 == await sessionValid(req.cookies.sessionId)) ) {
         res.status ( 400 ).send ({message: "Session Expired"});
+        return;
     }
     let id = req.params.id;
     let body = req.body;
+    console.log ( body );
     mqConn.createChannel(function(err, ch) {
         ch.assertQueue('', {exclusive: true}, function(err, q) {
             var corr = generateUuid();
@@ -317,7 +343,7 @@ app.post ( "/forum/comments/rating/:id", async (req, res) => {
                 }
             }, {noAck: true});
 
-            ch.sendToQueue('post_forum_comment_rating', new Buffer(JSON.stringify({body, id})), { correlationId: corr, replyTo: q.queue });
+            ch.sendToQueue('post_forum_comment_rating', new Buffer(JSON.stringify({am: body, id})), { correlationId: corr, replyTo: q.queue });
         });
     });
 });
@@ -326,9 +352,11 @@ app.post ( "/forum/comments/rating/:id", async (req, res) => {
 app.post ( "/forum/rating/:id", async ( req, res ) => {
     if (!req.cookies.sessionId || (0 == await sessionValid(req.cookies.sessionId))) {
         res.status(400).send({ message: 'Session Expired'}) // handle error
+        return;
     }
     let id = req.params.id;
     let body = req.body;
+    body = 1;
     mqConn.createChannel(function(err, ch) {
         ch.assertQueue('', {exclusive: true}, function(err, q) {
             var corr = generateUuid();
@@ -338,7 +366,7 @@ app.post ( "/forum/rating/:id", async ( req, res ) => {
                 }
             }, {noAck: true});
 
-            ch.sendToQueue('post_forum_rating', new Buffer(JSON.stringify({body, id})), { correlationId: corr, replyTo: q.queue });
+            ch.sendToQueue('post_forum_rating', new Buffer(JSON.stringify({am: body, id})), { correlationId: corr, replyTo: q.queue });
         });
     });
 });
@@ -347,6 +375,7 @@ app.post ( "/forum/rating/:id", async ( req, res ) => {
 app.post ( "/item/", async ( req, res ) => {
     if (!req.cookies.sessionId || (0 == await sessionValid(req.cookies.sessionId))) {
         res.status(400).send({ message: 'Session Expired'}) // handle error
+        return;
     }
     let body = req.body;
     mqConn.createChannel(function(err, ch) {
@@ -365,12 +394,14 @@ app.post ( "/item/", async ( req, res ) => {
 
 // Make a new comment on item :id
 app.post ( "/item/comments/:id", async ( req, res ) => {
-    /* if (!req.cookies.sessionId || (0 == await sessionValid(req.cookies.sessionId))) {
+    if (!req.cookies.sessionId || (0 == await sessionValid(req.cookies.sessionId))) {
         res.status(400).send({ message: 'Session Expired'}) // handle error
         return;
-    } */
+    }
+    let u = await getCurrentUser ( req.cookies.sessionId );
     let id = req.params.id;
     let body = req.body;
+    body.userId = u._id;
     console.log ( {id, body} );
     mqConn.createChannel(function(err, ch) {
         ch.assertQueue('', {exclusive: true}, function(err, q) {
@@ -389,9 +420,6 @@ app.post ( "/item/comments/:id", async ( req, res ) => {
 
 // Make a new user
 app.post ( "/user/", async ( req, res ) => {
-    if (!req.cookies.sessionId || (0 == await sessionValid(req.cookies.sessionId))) {
-        res.status(400).send({ message: 'Session Expired'}) // handle error
-    }
     let body = req.body;
     mqConn.createChannel(function(err, ch) {
         ch.assertQueue('', {exclusive: true}, function(err, q) {
@@ -430,11 +458,9 @@ app.post ( "/admin/:id", async ( req, res ) => {
 
 // Logins the user with the given information. Creates a session key and returns it
 app.post ( "/login", async ( req, res ) => {
-    console.log ( "login" );
     let body = req.body;
     let username = body.username;
     let hPass = body.password;
-    console.log ( body );
     if ( req.cookies.sessionId ) {
         if ( 0 == await sessionValid ( req.cookies.sessionId ) ) {
             res.clearCookie("sessionId");
@@ -448,15 +474,16 @@ app.post ( "/login", async ( req, res ) => {
     try {
         user = await db.users.getUserByEmail(username)
     } catch ( e ) {
-        res.status(404).send ( {message: "User not found"} );
+        res.status(403).send ( {message: "User not found"} );
         return;
     }
     if ( bcrypt.compareSync(hPass,user.password) ) {
         let id = generateUuid();
-        let i = (user.admin || 1);
-        await client.setAsync ( id, i, "EX", 60 * 60 );
-        res.cookie( "sessionId", id, i );
-        res.sendStatus(200);
+        await client.setAsync ( id, JSON.stringify(user), "EX", 60 * 60 );
+        res.cookie( "sessionId", id, true );
+        let userc = {...user};
+        userc.password = undefined;
+        res.status(200).send ( userc );
     } else {
         res.status(400).send ( {message: "Error - Login Invalid"} );
     }
@@ -472,6 +499,7 @@ app.post ( "/logout", async ( req, res ) => {
 });
 
 app.use ( "*", (req, res ) => {
+    console.log ( "Bad Route" );
     res.status(404).send();
 })
 

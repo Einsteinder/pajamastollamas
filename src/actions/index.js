@@ -1,5 +1,5 @@
 //import * as api from '../utils/api'
-import { postAProductComment, getProducts, getForumPosts, getForumComments, getProductComments, postlogin } from "../localApi";
+import { postAPost, postALike, postAPostComment, postAndLogout, postAProductComment, getProducts, getForumPosts, getForumComments, getProductComments, postlogin, postAProduct, postNewUser } from "../localApi";
 
 
 let nextCommentId = 0
@@ -54,12 +54,10 @@ export function postPost(post) {
   
   return (dispatch)=>{
 
-    var promise1 = new Promise(function(resolve, reject) {
-      setTimeout(resolve, 1000, "post post successfully");
-    });
+    var promise1 = postAPost ( post );
     promise1.then((response)=>{
-
-      dispatch(addPost(post));
+      response.id = response._id;
+      dispatch(addPost(response));
 
     })
 
@@ -80,9 +78,7 @@ export function addLike(id) {
 export function handlelike(id) {
   return (dispatch)=>{
 
-    var promise1 = new Promise(function(resolve, reject) {
-      setTimeout(resolve, 1000, "post comment successfully");
-    });
+    var promise1 = postALike (id);
     promise1.then((response)=>{
 
       dispatch(addLike(id));
@@ -128,9 +124,7 @@ export function addProduct(product){
 export function postProduct(product){
   return (dispatch)=>{
 
-    var promise1 = new Promise(function(resolve, reject) {
-      setTimeout(resolve, 2000, "post product successfully");
-    });
+    var promise1 = postAProduct ( product );
     promise1.then((response)=>{
 
       dispatch(addProduct(product));
@@ -146,12 +140,13 @@ export function postLogin(user){
     
   return (dispatch)=>{
 
-    console.log ( user );
     var promise1 = postlogin ( user.email, user.password );
     promise1.then((response)=>{
+      response.id = response._id;
+      dispatch(login(response));
 
-      dispatch(login(user));
-
+    }).catch((err) => {
+      alert ("Login Failed. Please Try Again");
     })
 
 
@@ -162,11 +157,8 @@ export function postLogout(){
     
     return (dispatch)=>{
   
-      var promise1 = new Promise(function(resolve, reject) {
-        setTimeout(resolve, 2000, "post logout successfully");
-      });
+      var promise1 = postAndLogout();
       promise1.then((response)=>{
-  
         dispatch(logout());
   
       })
@@ -181,12 +173,10 @@ console.log("action",user)
   
   return (dispatch)=>{
 
-    var promise1 = new Promise(function(resolve, reject) {
-      setTimeout(resolve, 1000, "post comment successfully");
-    });
+    var promise1 = postNewUser ( user );
     promise1.then((response)=>{
 
-      dispatch(signup(user));
+      dispatch(signup(response));
 
     })
 
@@ -199,12 +189,10 @@ export function postPostComment(comment) {
   
   return (dispatch)=>{
 
-    var promise1 = new Promise(function(resolve, reject) {
-      setTimeout(resolve, 1000, "post comment successfully");
-    });
+    var promise1 = postAPostComment ( comment );
     promise1.then((response)=>{
-
-      dispatch(addPostComment(comment));
+      response.id = response._id;
+      dispatch(addPostComment(response));
 
     })
 
@@ -221,8 +209,8 @@ export function postProductComment(comment) {
 
     var promise1 = postAProductComment ( comment );
     promise1.then((response)=>{
-
-      dispatch(addProductComment(comment));
+      response.id = response._id;
+      dispatch(addProductComment(response));
 
     })
 
@@ -281,13 +269,6 @@ export const fetchproducts =() =>{
 
 };
 }
-
-/*
-export const fetchPosts =() => dispatch =>{
-  return api.fetchPosts().then(posts => dispatch(receivePosts(posts)))
-}
-*/
-
 
 export const fetchPostComments =() =>{
   return (dispatch)=>{
