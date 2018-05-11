@@ -18,9 +18,9 @@ You need the rabbitmq-server
 We have provided a shell script "RequiredServers.sh", which can be run using "npm run installServers". It will install brew and use brew to download everything, so if you want to do it manually you are of course free to do so. It hasn't been tested very well, so use at your own risk.   
 
 ## Usage
-You need to make sure that redis, mongo, the rabbitmq-server, and the elastic search service are all runing before starting   
-You will need to run the front end client, using react, via npm start   
-You will need to seed the database using npm run seed   
-You will need to start the server and worker using npm run server   
+You need to make sure that redis, mongo, the rabbitmq-server, and the elastic search service are all running before starting   
+Then, seed the database using npm run seed   
+Now start the server and worker using npm run server   
+And start the client, using npm start (might take awhile)   
 From this, you can navigate the front end client, and may interact with the database   
 Your credentials for using the service are the username "prof@test.com" and the password "greatpassword"   

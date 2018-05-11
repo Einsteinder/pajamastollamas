@@ -40,6 +40,9 @@ class AppLayout extends Component {
       handleURLChange = (e)=>{
         this.setState({imageURL:e.target.value})
       }
+      handleDescChange = (e)=>{
+          this.setState({description:e.target.value});
+      }
     handleVisibleChange = (login_visible) => {
         this.setState({ login_visible });
     }
@@ -60,7 +63,7 @@ class AppLayout extends Component {
             name:this.state.productTitle,
             price:this.state.productPrice,
             imgURL: this.state.imageURL,
- 
+            description: this.state.description
  
         }
         this.props.postProduct(newProduct)
@@ -76,7 +79,7 @@ class AppLayout extends Component {
                     <Navbar inverse collapseOnSelect>
                         <Navbar.Header>
                             <Navbar.Brand>
-                                <Link className="nav-link" to="/">Pajamas to Llamas</Link>
+                                <Link className="nav-link" to="/">Pajamas For Llamas</Link>
 
                             </Navbar.Brand>
                             <Navbar.Toggle />
@@ -114,6 +117,12 @@ class AppLayout extends Component {
                                                             label="URL of the product image"
                                                         >
                                                             <Input value={this.state.imageURL} onChange={this.handleURLChange} placeholder="input the url of product picture..."  />
+
+                                                        </FormItem>
+                                                        <FormItem
+                                                            label="Description of the product"
+                                                        >
+                                                            <Input value={this.state.description} onChange={this.handleDescChange} placeholder="input the product's description..."  />
 
                                                         </FormItem>
                                                         <FormItem >
@@ -183,7 +192,7 @@ class AppLayout extends Component {
                     </Content>
 
                     <Footer style={{ textAlign: 'center' }} id="bottom">
-                        Pajamas to Llamas ©2018 Created by Cowboys of Gilead
+                        Pajamas For Llamas ©2018 Created by Cowboys of Gilead
   </Footer>
                 </Layout>
             </div>

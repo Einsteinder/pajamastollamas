@@ -38,6 +38,7 @@
     "installServers": "./RequiredServers.sh",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
+    "seed": "node ./server/test.js",
     "eject": "react-scripts eject",
     "server": "node ./server/worker.js & node ./server/app.js"
   }

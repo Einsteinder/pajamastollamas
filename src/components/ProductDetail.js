@@ -50,6 +50,8 @@ componentDidMount(){
     <div>
 
     <img src={product.imgURL} style={{height:"800",width:"800"}} alt={product.name}/>
+    <Header as='h2'>{product.name}</Header>
+    <p>{product.description}</p>
     <Container text>
 
     <Comment.Group>
